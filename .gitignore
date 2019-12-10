@@ -9,3 +9,5 @@ __pycache__
 venv
 app.db
 README.jeff
+microblog-0.15
+.env

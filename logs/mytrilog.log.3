@@ -1,43 +1,4 @@
-2019-10-18 10:08:13,650 ERROR: Exception on /simple.png [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
-Traceback (most recent call last):
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1951, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1820, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1949, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1935, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 195, in simple
-    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-ImportError: No module named 'matplotlib'
-2019-10-18 10:09:18,127 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:20:05,007 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:20:09,567 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
-Traceback (most recent call last):
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1951, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1820, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1949, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1935, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask_login/utils.py", line 261, in decorated_view
-    return func(*args, **kwargs)
-  File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 64, in index
-    png_output = png_output.getvalue().encode("base64")
-AttributeError: 'bytes' object has no attribute 'encode'
-2019-10-18 10:20:40,962 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:20:43,270 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
+2019-10-18 10:24:39,780 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
 Traceback (most recent call last):
   File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
     response = self.full_dispatch_request()
@@ -54,66 +15,103 @@ Traceback (most recent call last):
   File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask_login/utils.py", line 261, in decorated_view
     return func(*args, **kwargs)
   File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 67, in index
-    prev_url=prev_url, img_data=urllib.quote(png_output.rstrip('\n')))
-NameError: name 'urllib' is not defined
-2019-10-18 10:20:58,457 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:21:00,445 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
+    prev_url=prev_url, img_data=png_output.rstrip('\n'))
+AttributeError: '_io.BytesIO' object has no attribute 'rstrip'
+2019-10-18 10:25:39,991 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
+2019-12-03 13:27:27,620 INFO: MyTriLog startup... [in /scratch/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
+2019-12-03 13:29:58,904 INFO: MyTriLog startup... [in /scratch/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
+2019-12-03 13:30:02,194 ERROR: Exception on /index [GET] [in /scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py:1891]
 Traceback (most recent call last):
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 2446, in wsgi_app
     response = self.full_dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1951, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1951, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1820, in handle_user_exception
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1820, in handle_user_exception
     reraise(exc_type, exc_value, tb)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/_compat.py", line 39, in reraise
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/_compat.py", line 39, in reraise
     raise value
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1949, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1949, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1935, in dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1935, in dispatch_request
     return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask_login/utils.py", line 261, in decorated_view
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask_login/utils.py", line 261, in decorated_view
     return func(*args, **kwargs)
-  File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 68, in index
-    prev_url=prev_url, img_data=urllib.quote(png_output.rstrip('\n')))
-AttributeError: module 'urllib' has no attribute 'quote'
-2019-10-18 10:23:21,545 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:23:24,732 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
+  File "/scratch/knerr/repos/mydrop/mytrilog/app/routes.py", line 44, in index
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+ModuleNotFoundError: No module named 'matplotlib'
+2019-12-03 13:30:16,980 ERROR: Exception on /index [GET] [in /scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py:1891]
 Traceback (most recent call last):
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 2446, in wsgi_app
     response = self.full_dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1951, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1951, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1820, in handle_user_exception
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1820, in handle_user_exception
     reraise(exc_type, exc_value, tb)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/_compat.py", line 39, in reraise
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/_compat.py", line 39, in reraise
     raise value
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1949, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1949, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1935, in dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1935, in dispatch_request
     return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask_login/utils.py", line 261, in decorated_view
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask_login/utils.py", line 261, in decorated_view
     return func(*args, **kwargs)
-  File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 68, in index
-    prev_url=prev_url, img_data=urllib.quote(png_output.rstrip('\n')))
-NameError: name 'urllib' is not defined
-2019-10-18 10:23:49,744 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
-2019-10-18 10:23:52,457 ERROR: Exception on / [GET] [in /home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py:1891]
+  File "/scratch/knerr/repos/mydrop/mytrilog/app/routes.py", line 44, in index
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+ModuleNotFoundError: No module named 'matplotlib'
+2019-12-03 13:30:22,366 ERROR: Exception on /index [GET] [in /scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py:1891]
 Traceback (most recent call last):
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 2446, in wsgi_app
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 2446, in wsgi_app
     response = self.full_dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1951, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1951, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1820, in handle_user_exception
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1820, in handle_user_exception
     reraise(exc_type, exc_value, tb)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/_compat.py", line 39, in reraise
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/_compat.py", line 39, in reraise
     raise value
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1949, in full_dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1949, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask/app.py", line 1935, in dispatch_request
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1935, in dispatch_request
     return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/knerr/repos/mydrop/mytrilog/venv/lib/python3.5/site-packages/flask_login/utils.py", line 261, in decorated_view
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask_login/utils.py", line 261, in decorated_view
     return func(*args, **kwargs)
-  File "/home/knerr/repos/mydrop/mytrilog/app/routes.py", line 68, in index
-    prev_url=prev_url, img_data=urllib3.quote(png_output.rstrip('\n')))
-AttributeError: module 'urllib3' has no attribute 'quote'
-2019-10-18 10:24:37,119 INFO: MyTriLog startup... [in /home/knerr/repos/mydrop/mytrilog/app/__init__.py:49]
+  File "/scratch/knerr/repos/mydrop/mytrilog/app/routes.py", line 44, in index
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+ModuleNotFoundError: No module named 'matplotlib'
+2019-12-03 13:30:25,931 ERROR: Exception on /index [GET] [in /scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask_login/utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "/scratch/knerr/repos/mydrop/mytrilog/app/routes.py", line 44, in index
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+ModuleNotFoundError: No module named 'matplotlib'
+2019-12-03 13:31:32,076 ERROR: Exception on / [GET] [in /scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask/app.py", line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/scratch/knerr/venvs/mytrilog/venv/lib/python3.6/site-packages/flask_login/utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "/scratch/knerr/repos/mydrop/mytrilog/app/routes.py", line 44, in index
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+ModuleNotFoundError: No module named 'matplotlib'
