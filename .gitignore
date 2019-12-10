@@ -1,0 +1,11 @@
+a.out
+credentials.csv
+*.o 
+*.swp
+*.pyc
+#*#
+*~
+__pycache__
+venv
+app.db
+README.jeff

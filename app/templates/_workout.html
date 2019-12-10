@@ -1,0 +1,16 @@
+
+
+<table class="table table-hover">
+	<tr>
+<td width="70px">
+	<a href="{{url_for('user',username=workout.athlete.username)}}">
+	<img src="{{ workout.athlete.avatar(70) }}">
+	</a> 
+</td>
+<td>
+	<a href="{{url_for('user',username=workout.athlete.username)}}">{{workout.athlete.username}}</a> 
+	did a <br>{{workout.amount}} minute 
+	{{workout.what}} on {{moment(workout.when).format('L')}} ({{moment(workout.when).fromNow()}}): {{workout.comment}}
+</td>
+</tr>
+</table>
