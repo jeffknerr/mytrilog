@@ -1,4 +1,5 @@
 
+from app.main.jkutils import *
 from flask_login import current_user, login_required
 from flask import render_template, flash, redirect, url_for, request, current_app
 from app import db
@@ -29,6 +30,9 @@ def index():
     db.session.add(workout)
     db.session.commit()
     flash("Logged your workout!")
+    # add stuff here to make the plot???
+    workouts = current_user.workouts
+    plot(workouts)
     return redirect(url_for('main.index'))
   page = request.args.get('page', 1, type=int)
   workouts = current_user.followed_workouts().paginate(

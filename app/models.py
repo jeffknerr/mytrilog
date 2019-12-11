@@ -87,6 +87,9 @@ class Workout(db.Model):
     def __repr__(self):
         return '<Workout {} {}>'.format(self.what,self.amount)    
 
+    def getUsername(self):
+        return User.query.get(self.who).username
+
 
 @login.user_loader
 def load_user(id):
