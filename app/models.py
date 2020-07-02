@@ -79,7 +79,7 @@ class Workout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     what = db.Column(db.String(128))
     when = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    amount = db.Column(db.Float)
+    amount = db.Column(db.Float, default=0)
     weight = db.Column(db.Float)
     who = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment = db.Column(db.String(140))
@@ -89,6 +89,23 @@ class Workout(db.Model):
 
     def getUsername(self):
         return User.query.get(self.who).username
+
+    def getDOM(self):
+        """get day of month"""
+        return int(self.when.strftime("%d"))
+    def getDOY(self):
+        """get day of year"""
+        return int(self.when.strftime("%j"))
+    def getWhen(self):
+        return self.when
+    def getDate(self):
+        return self.when
+    def getMonthName(self): 
+        return self.when.strftime("%B")
+    def getComment(self):
+        return self.comment
+    def getWeight(self):
+        return self.weight
 
 
 @login.user_loader

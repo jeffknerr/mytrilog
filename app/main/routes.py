@@ -13,8 +13,6 @@ import io
 import os
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 @bp.before_request
@@ -29,19 +27,18 @@ def before_request():
 def index():
   form = WorkoutForm()
   if form.validate_on_submit():
-    workout = Workout(what=form.what.data, 
+      workout = Workout(what=form.what.data, 
                       when=form.when.data,
                       amount=form.amount.data,
                       weight=form.weight.data,
                       comment=form.comment.data,
                       athlete=current_user)
-    db.session.add(workout)
-    db.session.commit()
-    flash("Logged your workout!")
-    # add stuff here to make the plot???
-#   workouts = current_user.workouts
-#   plot(workouts)
-    return redirect(url_for('main.index'))
+      db.session.add(workout)
+      db.session.commit()
+      flash("Logged your workout!")
+      return redirect(url_for('main.index'))
+  elif request.method == 'GET':
+     form.what.data = "run"
   page = request.args.get('page', 1, type=int)
   workouts = current_user.followed_workouts().paginate(
       page, current_app.config['WORKOUTS_PER_PAGE'], False)
@@ -128,37 +125,19 @@ def explore():
     # reuses index template, but without the submit form part
 
 @bp.route('/plot/<user>')
+@login_required
 def plot(user):
-    workouts = Workout.query.all()
-    print("type: ", str(type(workouts)))
-    data = []
-    for i in range(len(workouts)):
-        w = workouts[i]
-        what = w.what
-        when = w.when       # datetime obj
-        wstr = when.strftime("%m/%d/%Y")
-        amt = w.amount
-        weight = w.weight   # float or None
-        who = w.getUsername()
-        com = w.comment
-        print(i,what,wstr,amt,weight,who,com)
-        data.append(amt)
-    N = len(data)
-    fig = Figure()
-    ax = fig.add_subplot(1, 1, 1)
-#   axis.axis('off')
-#   axis.imshow(data, interpolation='nearest')
-
-    doms = list(range(N))
-    ind = np.array(doms)  # the x locations for the groups
-    width = 0.4           # the width of the bars: can also be len(x) sequence
-
-    ax.grid(True)
-    ax.plot(data,'-')
-
+    if current_user.username != user:
+        return redirect(url_for('main.user', username=current_user.username))
+    # only get current user's workouts for plotting
+    dbid = current_user.get_id()    
+    workouts = Workout.query.filter_by(who=dbid).all()
+    # make the plot
+    fig = makeFigure(workouts)
     canvas = FigureCanvas(fig)
     output = io.BytesIO()
     canvas.print_png(output)
     response = make_response(output.getvalue())
     response.mimetype = 'image/png'
     return response
+

@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField 
+from wtforms import StringField, SubmitField, RadioField
 from wtforms import TextAreaField, DateField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Length, Optional
 from app.models import User
@@ -23,10 +23,14 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError('Please use a different username.')
 
 class WorkoutForm(FlaskForm):
-    what = TextAreaField('Run/Bike/Swim/Xfit', validators=[DataRequired(), Length(min=1, max=140)])
+    wkts = "run bike swim xfit rest".split()
+    whats = []
+    for w in wkts:
+        whats.append((w,w))
+    what = RadioField('Type of workout?', choices=whats)
     when = DateField(format='%Y-%m-%d', default=date.today)
     amount = FloatField()
-    weight = FloatField('Weight', validators=[Optional()])
+    weight = FloatField('Weight (optional)', validators=[Optional()])
     comment = TextAreaField('Comments?', validators=[Length(min=0, max=140)])
     submit = SubmitField('Log it!')
 

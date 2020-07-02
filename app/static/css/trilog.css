@@ -1,0 +1,67 @@
+/* trilog CSS Customizations */
+
+.navbar-brand {
+  padding: 0px 10px 0px 30px;
+}
+
+/*****  footer stuff  ********/
+
+.footer {
+  background-color: #444;
+  border: 1px solid transparent;
+}
+
+.footer-gray {
+  background-color: #EFEFEF;
+  width: 100%;
+}
+
+.footer-custom {
+  color: #aaa;
+  font: normal normal 12px/1.4 "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  max-width: 1008px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+
+.ftr-links {
+  padding: 0;
+  margin: 0;
+}
+
+.ftr-links:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.ftr-links li {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0;
+  padding: 3px 0;
+  color: #888;
+  font: normal normal 12px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  text-transform: uppercase;
+  /*width: 150px;*/
+}
+
+.footer-custom a,
+.footer-custom a:link,
+.footer-custom a:visited,
+.ftr-linksb li .link {
+  text-decoration: none;
+  color: #888;
+  padding: 5px 0;
+  display: block;
+}
+
+.footer-custom a:hover,
+.footer-custom a:active,
+.ftr-links li .link:hover {
+  text-decoration: underline;
+  color: #888;
+  cursor: pointer;
+}
