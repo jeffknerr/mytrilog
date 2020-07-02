@@ -1,6 +1,7 @@
 # mytrilog
 Web app to log triathlon workouts
 
+
 ## based on [The Flask Mega by Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
 
 All of this is just adapted from 
