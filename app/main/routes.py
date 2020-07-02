@@ -8,6 +8,14 @@ from app.models import User, Workout
 from datetime import datetime
 from app.main import bp
 
+from flask import make_response
+import io
+import os
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 @bp.before_request
 def before_request():
@@ -31,8 +39,8 @@ def index():
     db.session.commit()
     flash("Logged your workout!")
     # add stuff here to make the plot???
-    workouts = current_user.workouts
-    plot(workouts)
+#   workouts = current_user.workouts
+#   plot(workouts)
     return redirect(url_for('main.index'))
   page = request.args.get('page', 1, type=int)
   workouts = current_user.followed_workouts().paginate(
@@ -118,3 +126,39 @@ def explore():
     return render_template('index.html', title='Explore', workouts=workouts.items, 
                      next_url=next_url, prev_url=prev_url)
     # reuses index template, but without the submit form part
+
+@bp.route('/plot/<user>')
+def plot(user):
+    workouts = Workout.query.all()
+    print("type: ", str(type(workouts)))
+    data = []
+    for i in range(len(workouts)):
+        w = workouts[i]
+        what = w.what
+        when = w.when       # datetime obj
+        wstr = when.strftime("%m/%d/%Y")
+        amt = w.amount
+        weight = w.weight   # float or None
+        who = w.getUsername()
+        com = w.comment
+        print(i,what,wstr,amt,weight,who,com)
+        data.append(amt)
+    N = len(data)
+    fig = Figure()
+    ax = fig.add_subplot(1, 1, 1)
+#   axis.axis('off')
+#   axis.imshow(data, interpolation='nearest')
+
+    doms = list(range(N))
+    ind = np.array(doms)  # the x locations for the groups
+    width = 0.4           # the width of the bars: can also be len(x) sequence
+
+    ax.grid(True)
+    ax.plot(data,'-')
+
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response

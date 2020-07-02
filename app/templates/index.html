@@ -8,6 +8,7 @@
 <table> 
 <tr>
   <td><img src="/static/{{current_user.username}}.png" alt="workout plot"></td>
+  <td><img src="{{ url_for('main.plot', user=current_user.username) }}" alt="Image Placeholder" height="500"></td>
   <td>
 {% if form %}
 <h2>Log a workout?</h2>
