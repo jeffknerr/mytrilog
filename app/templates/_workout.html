@@ -9,8 +9,7 @@
 </td>
 <td>
 	<a href="{{url_for('main.user',username=workout.athlete.username)}}">{{workout.athlete.username}}</a> 
-	did a <br>{{workout.amount}} minute 
-	{{workout.what}} on {{moment(workout.when).format('L')}} ({{moment(workout.when).fromNow()}}): {{workout.comment}}
+	<br>{{workout.amount}} minute {{workout.what}} on {{workout.when.strftime("%m/%d")}}: {{workout.comment}}
 </td>
 </tr>
 </table>

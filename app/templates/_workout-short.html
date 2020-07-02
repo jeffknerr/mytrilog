@@ -1,7 +1,7 @@
 
 
 <tr>
-	<td>{{moment(workout.when).format('L')}}</td>
+	<td>{{workout.when.strftime("%m/%d/%Y")}}</td>
 	<td>{{workout.getUsername()}}</td>
 	<td>{{workout.what}}</td>
 	<td>{{workout.amount}}</td>
