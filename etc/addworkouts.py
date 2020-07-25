@@ -14,6 +14,9 @@ from app import db
 from app.models import User, Workout
 from datetime import datetime
 
+tfile = "2020-06-training.data"
+uname = "Jeff"
+
 def readfile(fn,u):
   workouts = []
   inf = open(fn,"r")
@@ -34,18 +37,19 @@ def readfile(fn,u):
   inf.close()
   return workouts
 
-users = User.query.all()
-u = None
-for user in users:
-  if user.username == "jeff":
-    u = user
-print(u)
 
-workouts = readfile("training.data",u)
+u = User(username='john', email='john@example.com')
+db.session.add(u)
+db.session.commit()
+
+u=1
+"""
+workouts = readfile(tfile, u)
 for w in workouts:
   print(w)
   db.session.add(w)
 db.session.commit()
+"""
 
 #    workout = Workout(what=form.what.data, 
 #                      when=form.when.data,

@@ -5,7 +5,7 @@ from flask import render_template, flash, redirect, url_for, request, current_ap
 from app import db
 from app.main.forms import EditProfileForm, WorkoutForm
 from app.models import User, Workout
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.main import bp
 
 from flask import make_response
@@ -130,10 +130,14 @@ def plot(user):
     if current_user.username != user:
         return redirect(url_for('main.user', username=current_user.username))
     # only get current user's workouts for plotting
+    now = datetime.utcnow()
+    then = now - timedelta(days=29)
     dbid = current_user.get_id()    
-    workouts = Workout.query.filter_by(who=dbid).all()
+    # only get last 30 days of workouts
+    workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
+    # filter such that only workouts from last 30 days...
     # make the plot
-    fig = makeFigure(workouts)
+    fig = makeFigure(workouts,now,then)
     canvas = FigureCanvas(fig)
     output = io.BytesIO()
     canvas.print_png(output)
