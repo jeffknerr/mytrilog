@@ -7,7 +7,6 @@ from app.main.forms import EditProfileForm, WorkoutForm
 from app.models import User, Workout
 from datetime import datetime, timedelta
 from app.main import bp
-
 from flask import make_response
 import io
 import os
