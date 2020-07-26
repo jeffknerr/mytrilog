@@ -8,6 +8,7 @@ venv
 app.db
 README.jeff
 .env
+test.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
