@@ -144,3 +144,24 @@ def plot(user):
     response.mimetype = 'image/png'
     return response
 
+@bp.route('/weightplot/<user>')
+@login_required
+def weightplot(user):
+    if current_user.username != user:
+        return redirect(url_for('main.user', username=current_user.username))
+    # only get current user's workouts for plotting
+    now = datetime.utcnow()
+    then = now - timedelta(days=29)
+    dbid = current_user.get_id()    
+    # only get last 30 days of workouts
+    workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
+    # filter such that only workouts from last 30 days...
+    # make the plot
+    fig = weightPlot(workouts,now,then)
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
+

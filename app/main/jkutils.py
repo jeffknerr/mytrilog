@@ -71,3 +71,64 @@ def makeFigure(workouts,now,then):
     fig.autofmt_xdate()
 
     return fig
+
+def weightPlot(workouts,now,then):
+    """given workouts, make and return matplotlib weight Figure"""
+    # get data in correct arrays
+    N = 30
+    wdata = [0]*N   # weight data list
+    dates = [0]*N   # date of workout list
+    for i in range(N):
+        dt = now - datetime.timedelta(days=(N-(i+1)))
+        dates[i] = datetime.date(dt.year,dt.month,dt.day)
+    wtotal = 0.0
+    wcounter = 0
+    for i in range(len(workouts)):
+        w = workouts[i]
+        daysago = (N-1) - (now - w.when).days
+        what = w.what
+        when = w.when       # datetime obj
+        wstr = when.strftime("%m/%d/%Y")
+        if w.weight == None:
+            weight = 0
+        else:
+            weight = w.weight
+            wtotal += weight
+            wcounter += 1
+            wdata[daysago] = weight
+        com = w.comment
+        #print(i,what,wstr,amt,weight,who,com,when,daysago,dates[daysago])
+    realdata = []
+    realdates = []
+    for i in range(len(wdata)):
+        if wdata[i] != 0:
+            realdata.append(wdata[i])
+            realdates.append(dates[i])
+    fig = Figure()
+    if wcounter == 0:
+        average = 160
+    else:
+        average = wtotal/wcounter
+    wdata = [average]*N
+    weight = np.array(wdata)
+    dates = np.array(dates)
+    ymax = average + 10
+    ymin = average - 10
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_ylim((ymin,ymax))
+    ax.set_xlabel("last 30 days")
+    ax.set_ylabel("weight (lbs)")
+    nstr = now.strftime("%m/%d/%Y")
+    tstr = then.strftime("%m/%d/%Y")
+    ax.set_title("weight data for %s to %s" % (tstr, nstr))
+    myFmt = DateFormatter("%b %d")
+    ax.xaxis.set_major_formatter(myFmt)
+
+    ax.plot(dates, weight, 'r-')
+    ax.plot(realdates, realdata, 'bh-')
+    ax.grid(True)
+    # Rotate date labels automatically
+    fig.autofmt_xdate()
+
+    return fig
+
