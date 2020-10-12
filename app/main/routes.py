@@ -165,3 +165,14 @@ def weightplot(user):
     response.mimetype = 'image/png'
     return response
 
+@bp.route('/stats')
+@login_required
+def stats():
+    # only get current user's workouts for plotting
+    now = datetime.utcnow()
+    then = now - timedelta(days=29)
+    dbid = current_user.get_id()    
+    # only get last 30 days of workouts
+    workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
+    avgw,runtot,weekrun = getStats(workouts,now,then)
+    return render_template('stats.html', title='Stats', user=user, avgw=avgw, runtot=runtot, weekrun=weekrun)

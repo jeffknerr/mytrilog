@@ -132,3 +132,27 @@ def weightPlot(workouts,now,then):
 
     return fig
 
+def getStats(workouts,now,then):
+    """given workouts, calc and return stats"""
+    wl = []   # weight data list
+    sl = []   # swim list
+    bl = []   # bike list
+    rl = []   # run list
+    xl = []   # xfit list
+    for i in range(len(workouts)):
+        w = workouts[i]
+        what = w.what
+        amt = w.amount
+        if what == "swim":
+            sl.append(amt)
+        elif what == "run":
+            rl.append(amt)
+        elif what == "bike":
+            bl.append(amt)
+        elif what == "xfit":
+            xl.append(amt)
+        if w.weight != None:
+            wl.append(w.weight)
+    totrun = sum(rl)/10.0 # assumes 10-min/mile pace
+    avgw = sum(wl)/len(wl)
+    return avgw,totrun,totrun/4.0
