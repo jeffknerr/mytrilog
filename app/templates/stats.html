@@ -5,9 +5,21 @@
 {% block app_content %}
     <h1>Your Statistics</h1>
     <h2>for the last 30 days of data...</h2>
-    <ul>
-    <li> approximate miles run: {{runtot}}    </li>
-    <li> approximate miles/week: {{weekrun}}    </li>
-    <li> average weight (lbs): {{avgw}}    </li>
-    </ul>
+
+    <table class="stats">
+        <tr>
+            <td> approximate total miles run </td>
+            <td> {{runtot}} </td>
+        </tr>
+        <tr>
+            <td> approximate miles/week run </td>
+            <td> {{weekrun}} </td>
+        </tr>
+        <tr>
+            <td> average weight (lbs) </td>
+            <td> {{avgw}} </td>
+        </tr>
+    </table>
+    <p>
+
 {% endblock %}

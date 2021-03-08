@@ -37,7 +37,7 @@ def index():
       flash("Logged your workout!")
       return redirect(url_for('main.index'))
   elif request.method == 'GET':
-     form.what.data = "run"
+     form.what.data = "rest"
   page = request.args.get('page', 1, type=int)
   workouts = current_user.followed_workouts().paginate(
       page, current_app.config['WORKOUTS_PER_PAGE'], False)
@@ -175,4 +175,8 @@ def stats():
     # only get last 30 days of workouts
     workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
     avgw,runtot,weekrun = getStats(workouts,now,then)
+    # convert to strings to format nicely...
+    avgw = "%.1f" % (avgw)
+    runtot = "%.1f" % (runtot)
+    weekrun = "%.2f" % (weekrun)
     return render_template('stats.html', title='Stats', user=user, avgw=avgw, runtot=runtot, weekrun=weekrun)

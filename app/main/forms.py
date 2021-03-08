@@ -23,13 +23,13 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError('Please use a different username.')
 
 class WorkoutForm(FlaskForm):
-    wkts = "run bike swim xfit rest".split()
+    wkts = "run bike swim xfit rest yoga".split()
     whats = []
     for w in wkts:
         whats.append((w,w))
     what = RadioField('Type of workout?', choices=whats)
     when = DateField(format='%Y-%m-%d', default=date.today)
-    amount = FloatField()
+    amount = FloatField(default=0)
     weight = FloatField('Weight (optional)', validators=[Optional()])
     comment = TextAreaField('Comments?', validators=[Length(min=0, max=140)])
     submit = SubmitField('Log it!')

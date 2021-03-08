@@ -21,6 +21,51 @@ available in the /mytrilog directory, off of the nginx main website directory.
 
 ---
 
+# local test/installation instructions
+
+I am running this on debian 10/ubuntu 20.04 linux computers.
+
+Set up .env file (if you want to test emails, for password resets):
+
+```
+SECRET_KEY=your-secret-key-here
+MAIL_SERVER=your.mailserver.net
+MAIL_PORT=587
+MAIL_USE_TLS=1
+MAIL_USERNAME=yourusername
+MAIL_PASSWORD='your.password.here'
+ADMINS='user@yourserver.net'
+```
+
+Install flask and everything needed:
+
+```
+apt-get install python3-venv
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+flask db upgrade
+flask run
+```
+
+That should start the development server which says to use
+http://127.0.0.1:5000, but because I am using `PREFIX=/mytrilog`, you 
+have to go to `http://127.0.0.1:5000/mytrilog`, which should show
+you a "Sign In" page.
+
+---
+
+# production test/installation instructions
+
+- gunicorn
+- nginx
+- certbot/letsencrypt
+- supervisord
+- git auto-deploy
+- static dir link from main website back to app/static dir???
+
+---
+
 ### stuff I always have to look up
 
 #### manually delete entry from db

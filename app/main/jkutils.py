@@ -15,6 +15,7 @@ def makeFigure(workouts,now,then):
     sl = [0]*N    # swim list
     bl = [0]*N    # bike list
     rl = [0]*N    # run list
+    yl = [0]*N    # yoga list
     xl = [0]*N    # xfit list
     dates = [0]*N # date of workout list
     for i in range(N):
@@ -29,6 +30,8 @@ def makeFigure(workouts,now,then):
             sl[daysago] = amt
         elif what == "run":
             rl[daysago] = amt
+        elif what == "yoga":
+            yl[daysago] = amt
         elif what == "bike":
             bl[daysago] = amt
         elif what == "xfit":
@@ -42,6 +45,7 @@ def makeFigure(workouts,now,then):
     swim = np.array(sl)
     bike = np.array(bl)
     run  = np.array(rl)
+    yoga  = np.array(yl)
     xfit = np.array(xl)
     dates = np.array(dates)
 
@@ -64,9 +68,11 @@ def makeFigure(workouts,now,then):
     p2 = ax.bar(dates, bike, width, color='#00ff33', bottom=sum([swim]))
     p3 = ax.bar(dates, run , width, color='#ff33aa', bottom=sum([swim, bike]))
     p4 = ax.bar(dates, xfit, width, color='#33aacc', bottom=sum([swim, bike, run]))
+    p5 = ax.bar(dates, yoga, width, color='#ffa500', bottom=sum([swim, bike, run, xfit]))
 
     ax.grid(True)
-    ax.legend( (p1[0], p2[0], p3[0], p4[0]), ('swim', 'bike', 'run ', 'xfit') , prop={'size':8})
+    ax.legend( (p1[0], p2[0], p3[0], p4[0], p5[0]), ('swim', 'bike', 'run ',
+                                              'xfit', 'yoga') , prop={'size':8})
     # Rotate date labels automatically
     fig.autofmt_xdate()
 
@@ -138,6 +144,7 @@ def getStats(workouts,now,then):
     sl = []   # swim list
     bl = []   # bike list
     rl = []   # run list
+    yl = []   # yoga list
     xl = []   # xfit list
     for i in range(len(workouts)):
         w = workouts[i]
@@ -147,12 +154,15 @@ def getStats(workouts,now,then):
             sl.append(amt)
         elif what == "run":
             rl.append(amt)
+        elif what == "yoga":
+            yl.append(amt)
         elif what == "bike":
             bl.append(amt)
         elif what == "xfit":
             xl.append(amt)
         if w.weight != None:
             wl.append(w.weight)
-    totrun = sum(rl)/10.0 # assumes 10-min/mile pace
+    totrun = sum(rl)/9.0 # assumes 9-min/mile pace
     avgw = sum(wl)/len(wl)
+    # average weight, total run, and total run per week
     return avgw,totrun,totrun/4.0

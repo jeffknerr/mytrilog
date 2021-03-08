@@ -1,5 +1,12 @@
 /* trilog CSS Customizations */
 
+table.stats tr, td {
+  background-color: #ccc;
+  border: 1px solid black;
+  padding: 8px;
+  text-align: right;
+}
+
 /*****  footer stuff  ********/
 
 .footer {
