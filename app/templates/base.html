@@ -7,7 +7,7 @@
 
 {% block head %}
 {{super()}}
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='/images/favicon.png') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
 {% endblock %}
 
 
@@ -86,6 +86,7 @@
 	{{moment(current_user.last_seen).format('LLLL')}}</li> ::
         {% endif %}
         <li><a href="https://www.goofydogears.net">GDE Home</a></li> ::
+        <li><a href="https://github.com/jeffknerr/mytrilog">GitHub</a></li> ::
         <li>&copy; Jeff! :) </li>
       </ul>
     </div>

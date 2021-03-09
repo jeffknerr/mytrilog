@@ -30,8 +30,10 @@
   <th>date</th><th>who</th><th>what</th><th>minutes</th><th>comment</th>
 </tr>
     {% for workout in workouts %}
+    <tr>
       {% include '_workout-short.html' %}
     {% endfor %}
+    </tr>
 </table>
 <hr>
 

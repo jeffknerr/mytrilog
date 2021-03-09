@@ -163,6 +163,8 @@ def getStats(workouts,now,then):
         if w.weight != None:
             wl.append(w.weight)
     totrun = sum(rl)/9.0 # assumes 9-min/mile pace
-    avgw = sum(wl)/len(wl)
+    avgw = 0
+    if len(wl) > 0:
+      avgw = sum(wl)/len(wl)
     # average weight, total run, and total run per week
     return avgw,totrun,totrun/4.0
