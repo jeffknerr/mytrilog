@@ -3,19 +3,28 @@
 {% block styles -%}
 {{super()}}
 <link href="{{ url_for('static', filename='css/trilog.css') }}" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 {% endblock styles %}
 
 {% block head %}
 {{super()}}
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+<link type="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
 {% endblock %}
-
 
 {% block scripts %}
     {{ super() }}
     {{ moment.include_moment() }}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('#datepick').datetimepicker({ 
+            format: 'YYYY-MM-DD',
+          });
+    });
+  </script>
 {% endblock %}
-
 
 {% block title %}
    {% if title %}

@@ -7,24 +7,22 @@
 
 <table> 
 <tr>
-  <td><img src="{{ url_for('main.plot', user=current_user.username) }}" alt="Image Placeholder" height="400"></td>
+  <td><img src="{{ url_for('main.plot', user=current_user.username) }}" alt="Image Placeholder" height="600"></td>
   <td>
 {% if form %}
 <h2>Log a workout?</h2>
-{{ wtf.quick_form(form) }}
+    <div class="row">
+      <div class='col-sm-8'>
+        {{ wtf.quick_form(form) }}
+      </div>
+    </div>
 {% endif %}
   </td>
 </tr>
-<tr>
-  <td><img src="{{ url_for('main.weightplot', user=current_user.username) }}" alt="Image Placeholder" width="400" height="200"></td>
-  <td></td>
-</tr>
 </table>
 
-
 <br>
-<hr>
-<hr>
+
 <table class="table table-hover">
 <tr>
   <th>date</th><th>who</th><th>what</th><th>minutes</th><th>comment</th>

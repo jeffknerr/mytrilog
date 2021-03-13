@@ -28,7 +28,7 @@ class WorkoutForm(FlaskForm):
     for w in wkts:
         whats.append((w,w))
     what = RadioField('Type of workout?', choices=whats)
-    when = DateField(format='%Y-%m-%d', default=date.today)
+    when = DateField(id='datepick', format='%Y-%m-%d', default=date.today)
     amount = FloatField(default=0)
     weight = FloatField('Weight (optional)', validators=[Optional()])
     comment = TextAreaField('Comments?', validators=[Length(min=0, max=140)])
