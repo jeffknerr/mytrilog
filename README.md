@@ -18,6 +18,7 @@ but you can log workouts and see a graph.
 I'm using `PREFIX = "/mytrilog"` in `app/__init__.py` to make the website
 available in the /mytrilog directory, off of the nginx main website directory.
 
+![mytrilog screenshot](screenshot.png)
 
 ---
 
