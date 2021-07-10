@@ -119,6 +119,6 @@ MariaDB [mytrilog]> Bye
 ### Added Edit
 
 I added an Edit Workout option, for when I type in the wrong date or
-wrong workout "what". Thanks for this page for helping me with the
+wrong workout "what". Thanks to Randall Degges for this page and help with the
 edit templates and links:
 [https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python](https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python)
