@@ -115,3 +115,10 @@ MariaDB [mytrilog]> Bye
 - git commit/push for repo triggers github webhook, which is seen 
     by webhook service on server, and runs a deploy script (pull
     the repo, rsync files to /var/www location, restart webapp)
+
+### Added Edit
+
+I added an Edit Workout option, for when I type in the wrong date or
+wrong workout "what". Thanks for this page for helping me with the
+edit templates and links:
+[https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python](https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python)
