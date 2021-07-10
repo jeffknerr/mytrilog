@@ -1,17 +1,15 @@
 
 from app.main.jkutils import *
 from flask_login import current_user, login_required
-from flask import render_template, flash, redirect, url_for, request, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app, abort
 from app import db
-from app.main.forms import EditProfileForm, WorkoutForm
+from app.main.forms import EditProfileForm, WorkoutForm, ChangeWorkoutForm
 from app.models import User, Workout
 from datetime import datetime, timedelta
 from app.main import bp
 from flask import make_response
 import io
-import os
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
 
 @bp.before_request
@@ -20,37 +18,39 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
-@bp.route('/', methods=['GET','POST'])
-@bp.route('/index', methods=['GET','POST'])
+
+@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-  form = WorkoutForm()
-  if form.validate_on_submit():
-      workout = Workout(what=form.what.data, 
-                      when=form.when.data,
-                      amount=form.amount.data,
-                      weight=form.weight.data,
-                      comment=form.comment.data,
-                      athlete=current_user)
-      db.session.add(workout)
-      db.session.commit()
-      flash("Logged your workout!")
-      return redirect(url_for('main.index'))
-  elif request.method == 'GET':
-     form.what.data = "rest"
-  page = request.args.get('page', 1, type=int)
-  workouts = current_user.followed_workouts().paginate(
-      page, current_app.config['WORKOUTS_PER_PAGE'], False)
-  next_url = url_for('main.index', page=workouts.next_num) if workouts.has_next else None
-  prev_url = url_for('main.index', page=workouts.prev_num) if workouts.has_prev else None
+    form = WorkoutForm()
+    if form.validate_on_submit():
+        workout = Workout(what=form.what.data,
+                          when=form.when.data,
+                          amount=form.amount.data,
+                          weight=form.weight.data,
+                          comment=form.comment.data,
+                          athlete=current_user)
+        db.session.add(workout)
+        db.session.commit()
+        flash("Logged your workout!")
+        return redirect(url_for('main.index'))
+    elif request.method == 'GET':
+        form.what.data = "rest"
+    page = request.args.get('page', 1, type=int)
+    workouts = current_user.followed_workouts().paginate(
+        page, current_app.config['WORKOUTS_PER_PAGE'], False)
+    next_url = url_for('main.index', page=workouts.next_num) if workouts.has_next else None
+    prev_url = url_for('main.index', page=workouts.prev_num) if workouts.has_prev else None
 
-  return render_template('index.html', title='Home', form=form,
-                           workouts=workouts.items, next_url=next_url,
-                           prev_url=prev_url)
+    return render_template('index.html', title='Home', form=form,
+                            workouts=workouts.items, next_url=next_url,
+                            prev_url=prev_url)
+
 
 @bp.route('/about')
 def about():
-  return render_template('about.html', title='About')
+    return render_template('about.html', title='About')
 
 
 @bp.route('/user/<username>')
@@ -79,7 +79,10 @@ def edit_profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
+    return render_template('edit_profile.html',
+                           title='Edit Profile',
+                           form=form)
+
 
 @bp.route('/follow/<username>')
 @login_required
@@ -96,6 +99,7 @@ def follow(username):
     flash('You are following {}!'.format(username))
     return redirect(url_for('main.user', username=username))
 
+
 @bp.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
@@ -111,6 +115,7 @@ def unfollow(username):
     flash('You are not following {}.'.format(username))
     return redirect(url_for('main.user', username=username))
 
+
 @bp.route('/explore')
 @login_required
 def explore():
@@ -123,6 +128,7 @@ def explore():
                      next_url=next_url, prev_url=prev_url)
     # reuses index template, but without the submit form part
 
+
 @bp.route('/plot/<user>')
 @login_required
 def plot(user):
@@ -131,7 +137,7 @@ def plot(user):
     # only get current user's workouts for plotting
     now = datetime.utcnow()
     then = now - timedelta(days=29)
-    dbid = current_user.get_id()    
+    dbid = current_user.get_id()
     # only get last 30 days of workouts
     workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
     # filter such that only workouts from last 30 days...
@@ -144,6 +150,7 @@ def plot(user):
     response.mimetype = 'image/png'
     return response
 
+
 @bp.route('/weightplot/<user>')
 @login_required
 def weightplot(user):
@@ -152,7 +159,7 @@ def weightplot(user):
     # only get current user's workouts for plotting
     now = datetime.utcnow()
     then = now - timedelta(days=29)
-    dbid = current_user.get_id()    
+    dbid = current_user.get_id()
     # only get last 30 days of workouts
     workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
     # filter such that only workouts from last 30 days...
@@ -165,18 +172,68 @@ def weightplot(user):
     response.mimetype = 'image/png'
     return response
 
+
 @bp.route('/stats')
 @login_required
 def stats():
     # only get current user's workouts for plotting
     now = datetime.utcnow()
     then = now - timedelta(days=29)
-    dbid = current_user.get_id()    
+    dbid = current_user.get_id()
     # only get last 30 days of workouts
     workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
-    avgw,runtot,weekrun = getStats(workouts,now,then)
+    avgw, runtot, weekrun = getStats(workouts, now, then)
     # convert to strings to format nicely...
     avgw = "%.1f" % (avgw)
     runtot = "%.1f" % (runtot)
     weekrun = "%.2f" % (weekrun)
-    return render_template('stats.html', title='Stats', user=user, avgw=avgw, runtot=runtot, weekrun=weekrun)
+    return render_template('stats.html',
+                           title='Stats',
+                           user=user,
+                           avgw=avgw,
+                           runtot=runtot,
+                           weekrun=weekrun)
+
+
+@bp.route('/edit')
+@login_required
+def edit():
+    """show workouts, allow user to select one for editing"""
+    username = current_user.username
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    workouts = user.workouts.order_by(Workout.when.desc()).paginate(
+        page, 5 + current_app.config['WORKOUTS_PER_PAGE'], False)
+    next_url = url_for('main.edit', username=user.username, page=workouts.next_num) if workouts.has_next else None
+    prev_url = url_for('main.edit', username=user.username, page=workouts.prev_num) if workouts.has_prev else None
+    return render_template('edit.html', user=user, workouts=workouts.items,
+                           next_url=next_url, prev_url=prev_url)
+
+
+@bp.route('/editworkout/<what>/<when>/<who>', methods=['GET', 'POST'])
+@login_required
+def editworkout(what, when, who):
+    """present form to user that allows them to edit the workout"""
+    username = current_user.username
+    dtwhen = datetime.fromisoformat(when)
+    wrkout = Workout.query.filter_by(who=who).filter_by(when=dtwhen).filter_by(what=what).first_or_404()
+    # make sure user is correct user
+    if wrkout.getUsername() != username:
+        abort(403)
+    form = ChangeWorkoutForm()
+    if form.validate_on_submit():
+        wrkout.what = form.what.data
+        wrkout.when = form.when.data
+        wrkout.amount = form.amount.data
+        wrkout.weight = form.weight.data
+        wrkout.comment = form.comment.data
+        db.session.commit()
+        flash("Saved your edited workout...")
+        return redirect(url_for('main.index'))
+    # add the existing data here
+    form.what.data = wrkout.what
+    form.when.data = wrkout.when
+    form.amount.data = wrkout.amount
+    form.weight.data = wrkout.weight
+    form.comment.data = wrkout.comment
+    return render_template("changeworkout.html", form=form)

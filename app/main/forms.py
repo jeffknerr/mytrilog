@@ -1,10 +1,14 @@
+"""
+forms for editing profile and logging/changing workouts
+"""
 
+
+from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField
 from wtforms import TextAreaField, DateField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Length, Optional
 from app.models import User
-from datetime import date
 
 
 class EditProfileForm(FlaskForm):
@@ -22,11 +26,12 @@ class EditProfileForm(FlaskForm):
             if user is not None:
                 raise ValidationError('Please use a different username.')
 
+
 class WorkoutForm(FlaskForm):
     wkts = "run bike swim xfit rest yoga".split()
     whats = []
     for w in wkts:
-        whats.append((w,w))
+        whats.append((w, w))
     what = RadioField('Type of workout?', choices=whats)
     when = DateField(id='datepick', format='%Y-%m-%d', default=date.today)
     amount = FloatField(default=0)
@@ -34,3 +39,6 @@ class WorkoutForm(FlaskForm):
     comment = TextAreaField('Comments?', validators=[Length(min=0, max=140)])
     submit = SubmitField('Log it!')
 
+
+class ChangeWorkoutForm(WorkoutForm):
+    submit = SubmitField('Save Changes')

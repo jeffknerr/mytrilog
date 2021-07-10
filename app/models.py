@@ -74,8 +74,8 @@ class User(UserMixin, db.Model):
         return User.query.get(id)
 
 
-
 class Workout(db.Model):
+    """workout objects, unique in what and when"""
     id = db.Column(db.Integer, primary_key=True)
     what = db.Column(db.String(128))
     when = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -85,7 +85,7 @@ class Workout(db.Model):
     comment = db.Column(db.String(140))
 
     def __repr__(self):
-        return '<Workout {} {}>'.format(self.what,self.amount)    
+        return '<Workout {} {} {}>'.format(self.what,self.amount,self.when)    
 
     def getUsername(self):
         return User.query.get(self.who).username

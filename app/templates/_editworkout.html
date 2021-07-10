@@ -1,0 +1,15 @@
+
+
+<table class="table table-hover">
+<tr>
+<td>
+<a href="{{url_for('main.editworkout', what=workout.what, when=workout.when, who=workout.who)}}">
+		<b>{{workout.when.strftime("%m/%d/%Y")}}</b>:
+{{workout.what}} -- 
+{{workout.amount}} minutes --
+weight: {{workout.weight}} --
+comment: {{workout.comment}}
+</a>
+</td>
+</tr>
+</table>
