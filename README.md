@@ -26,7 +26,7 @@ available in the /mytrilog directory, off of the nginx main website directory.
 
 I am running this on debian 10/ubuntu 20.04 linux computers.
 
-Set up .env file (if you want to test emails, for password resets):
+Set up the `.env` file (if you want to test emails, for password resets):
 
 ```
 SECRET_KEY=your-secret-key-here
@@ -38,7 +38,23 @@ MAIL_PASSWORD='your.password.here'
 ADMINS='user@yourserver.net'
 ```
 
-Install flask and everything needed:
+For example, if you want to send mail using your gmail account, 
+here are the settings:
+
+```
+SECRET_KEY=your-secret-key-here
+MAIL_PORT=587
+MAIL_USE_TLS=1
+MAIL_USERNAME="yourusername@gmail.com"
+MAIL_PASSWORD="your 16-char app password"
+ADMINS='user@yourserver.net'
+```
+
+Note: the `16-char app password` is a
+[google app password](https://security.google.com/settings/security/apppasswords)
+that you have to set up (not hard).
+
+Next install flask and everything needed:
 
 ```
 apt-get install python3-venv
