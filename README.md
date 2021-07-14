@@ -35,7 +35,7 @@ MAIL_PORT=587
 MAIL_USE_TLS=1
 MAIL_USERNAME=yourusername
 MAIL_PASSWORD='your.password.here'
-ADMINS='user@yourserver.net'
+ADMINS=["user@yourserver.net"]
 ```
 
 For example, if you want to send mail using your gmail account, 
@@ -47,12 +47,16 @@ MAIL_PORT=587
 MAIL_USE_TLS=1
 MAIL_USERNAME="yourusername@gmail.com"
 MAIL_PASSWORD="your 16-char app password"
-ADMINS='user@yourserver.net'
+ADMINS=["user@yourserver.net"]
 ```
 
 Note: the `16-char app password` is a
 [google app password](https://security.google.com/settings/security/apppasswords)
 that you have to set up (not hard).
+
+Also, `SECRET_KEY` is just used by Flask for security (set it to something
+besides "your-secret-key-here"), and `ADMINS` is a list of string email address 
+for site admins (they get emails when things go wrong).
 
 Next install flask and everything needed:
 
