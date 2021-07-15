@@ -164,7 +164,7 @@ where `gunicorn` is listening
 
 ```
 knerr@li1075-88 /etc/nginx/sites-enabled
-  $ cat gde
+  $ cat your.fqdn
 
 server {
     # listen on port 80 (http)
