@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<h1>your year-to-date data...</h1>
+
+<hr>
+
+<img src="{{ url_for('main.ytdplot', user=current_user.username) }}" alt="ytd plot">
+
+<hr>
+<br>
+
+{% endblock %}

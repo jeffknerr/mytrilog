@@ -16,7 +16,7 @@ def makeFigure(workouts,now,then):
     ax2 = fig.add_subplot(3, 1, 3)      # this plot is smaller
     fig.subplots_adjust(hspace=0.5)
     #----------- workouts plot ---------------------#
-    swim,bike,run,yoga,xfit,dates=makeWorkoutPlot(workouts,now,then)
+    swim,bike,run,yoga,xfit,dates=makeWorkoutPlot(workouts,now,then,30)
     ymax = 140  # minutes
     ax1.set_ylim(0,ymax)
     ax1.set_xlabel("last 30 days")
@@ -40,7 +40,7 @@ def makeFigure(workouts,now,then):
                                               'xfit', 'yoga') , prop={'size':8})
 
     #----------- weight plot ---------------------#
-    ymin,ymax,dates,weight,realdates,realdata=weightPlot(workouts,now,then)
+    ymin,ymax,dates,weight,realdates,realdata=weightPlot(workouts,now,then,30)
     ax2.set_ylim((ymin,ymax))
     ax2.set_xlabel("last 30 days")
     ax2.set_ylabel("weight (lbs)")
@@ -59,10 +59,9 @@ def makeFigure(workouts,now,then):
 
     return fig
 
-def makeWorkoutPlot(workouts,now,then):
+def makeWorkoutPlot(workouts,now,then,N):
     """given workouts, make and return matplotlib Figure"""
     # get data in correct arrays
-    N = 30
     sl = [0]*N    # swim list
     bl = [0]*N    # bike list
     rl = [0]*N    # run list
@@ -101,10 +100,9 @@ def makeWorkoutPlot(workouts,now,then):
     return swim,bike,run,yoga,xfit,dates
 
 
-def weightPlot(workouts,now,then):
+def weightPlot(workouts,now,then,N):
     """given workouts, make and return matplotlib weight Figure"""
     # get data in correct arrays
-    N = 30
     wdata = [0]*N   # weight data list
     dates = [0]*N   # date of workout list
     for i in range(N):
@@ -171,3 +169,52 @@ def getStats(workouts,now,then):
       avgw = sum(wl)/len(wl)
     # average weight, total run, and total run per week
     return avgw,totrun,totrun/4.0
+
+def makeYTDFigure(workouts,now,then):
+    fig = Figure()
+    ax1 = fig.add_subplot(3, 1, (1,2))  # 3 rows, this plot takes up 2
+    ax2 = fig.add_subplot(3, 1, 3)      # this plot is smaller
+    fig.subplots_adjust(hspace=0.5)
+    #----------- workouts plot ---------------------#
+    swim,bike,run,yoga,xfit,dates=makeWorkoutPlot(workouts,now,then,365)
+    ymax = 140  # minutes
+    ax1.set_ylim(0,ymax)
+    ax1.set_xlabel("days")
+    ax1.set_ylabel("workout duration (min)")
+    nstr = now.strftime("%m/%d/%Y")
+    tstr = then.strftime("%m/%d/%Y")
+    ax1.set_title("triathlon training data for %s to %s" % (tstr, nstr))
+    myFmt = DateFormatter("%b %d")
+    ax1.xaxis.set_major_formatter(myFmt)
+    width = 0.2           # the width of the bars
+    ax1.set_yticks(np.arange(0,ymax,10))
+
+    p1 = ax1.bar(dates, swim, width, color='#3333ff')
+    p2 = ax1.bar(dates, bike, width, color='#00ff33', bottom=sum([swim]))
+    p3 = ax1.bar(dates, run , width, color='#ff33aa', bottom=sum([swim, bike]))
+    p4 = ax1.bar(dates, xfit, width, color='#33aacc', bottom=sum([swim, bike, run]))
+    p5 = ax1.bar(dates, yoga, width, color='#ffa500', bottom=sum([swim, bike, run, xfit]))
+
+    ax1.grid(True)
+    ax1.legend( (p1[0], p2[0], p3[0], p4[0], p5[0]), ('swim', 'bike', 'run ',
+                                              'xfit', 'yoga') , prop={'size':8})
+
+    #----------- weight plot ---------------------#
+    ymin,ymax,dates,weight,realdates,realdata=weightPlot(workouts,now,then,365)
+    ax2.set_ylim((ymin,ymax))
+    ax2.set_xlabel("days")
+    ax2.set_ylabel("weight (lbs)")
+    nstr = now.strftime("%m/%d/%Y")
+    tstr = then.strftime("%m/%d/%Y")
+    ax2.set_title("weight data for %s to %s" % (tstr, nstr))
+    myFmt = DateFormatter("%b %d")
+    ax2.xaxis.set_major_formatter(myFmt)
+
+    ax2.plot(dates, weight, 'r-')
+    ax2.plot(realdates, realdata, 'bh-')
+    ax2.grid(True)
+
+    # Rotate date labels automatically
+    fig.autofmt_xdate()
+
+    return fig

@@ -172,6 +172,24 @@ def weightplot(user):
     response.mimetype = 'image/png'
     return response
 
+@bp.route('/ytdplot/<user>')
+@login_required
+def ytdplot(user):
+    if current_user.username != user:
+        return redirect(url_for('main.user', username=current_user.username))
+    # only get current user's workouts for plotting
+    now = datetime.utcnow()
+    then = now - timedelta(days=364)
+    dbid = current_user.get_id()
+    workouts = Workout.query.filter_by(who=dbid).filter(Workout.when <= now, Workout.when >= then).all()
+    # make the plot
+    fig = makeYTDFigure(workouts,now,then)
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
 
 @bp.route('/stats')
 @login_required

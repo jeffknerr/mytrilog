@@ -44,6 +44,7 @@ x change master to main in git repo
 - add YTD graph and stats
 - add unit testing!!
 - full code review...
+- write script to populate db with good fake data
 
 ---
 
