@@ -38,6 +38,8 @@ and just want this deployed in a subdirectory)
 
 
 Still to do:
+- finish writing the README
+x change master to main in git repo
 - add more to the Stats page
 - add YTD graph and stats
 - add unit testing!!
@@ -105,22 +107,459 @@ add a new user and test out the app.
 
 # production test/installation instructions
 
-- gunicorn
-- nginx
-- certbot/letsencrypt
-- supervisord
-- git auto-deploy
-- static dir link from main website back to app/static dir???
+I'm using a setup very similar to 
+[Miguel's _deploy on linux_ article](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux). The main differences for me are:
 
----
+- I already had a debian linux server running on
+[linode.com](https://www.linode.com/) that was hosting a website, so
+I wanted to host this app off the current website in `/mytrilog`. That's
+why my code uses the `PREFIX = "/mytrilog"` in `app/__init__.py`
+- I set up my github repo to auto-deploy, using a webhook
+- I use certbot/letsencrypt for the SSL cert
+
+Below are my notes on setting up each part of the service.
+
+### overview
+
+- certbot/letsencrypt: provide the SSL cert so everything is encrypted
+- nginx: serves out my current website, plus uses `proxy_pass` for the
+webhook (anything that starts with `/hooks/`) and the flask app (anything
+that starts with `/mytrilog`)
+- gunicorn: a web server running on localhost:8000 that actually serves the
+flask mytrilog app (nginx forwards any requests that start with `/mytrilog`
+over to the gunicorn server)
+- supervisord: an easy way to start/restart gunicorn when my server boots. Also used
+to start the webhook daemon that listens for connections from github.
+- git auto-deploy: sends a specific request/payload to my server each time I
+"git commit/push" the repo
+- static dir link from main website back to app/static dir: still need to fix
+this, but I have a link from `/var/www/mywebsite/static` to 
+`/var/www/mytrilog/app/static/`. Without that I couldn't get any static
+content (css, images) to show up on the web app.
+
+Details on all of this below...
+
+### certbot/letsencrypt
+
+    sudo apt-get update
+    sudo apt-get install certbot python-certbot-nginx
+    sudo certbot --nginx
+
+- give server FQDN for "domain name"
+- choose "Redirect all requests to https"
+- should put certs in `/etc/letsencrypt/live/your.fqdn/`
+
+### nginx
+
+Below is most of my `/etc/nginx/sites-enabled` file.
+What it's doing:
+
+- redirecting all port 80 traffic to https
+- serving out a website at /var/www/yourFQDNsite
+- sending any `https://your.fqdn/hooks` traffic to `localhost:9000`
+where `webhook` is listening
+- sending any `https://your.fqdn/mytrilog` traffic to `localhost:8000`
+where `gunicorn` is listening
+
+
+```
+knerr@li1075-88 /etc/nginx/sites-enabled
+  $ cat gde
+
+server {
+    # listen on port 80 (http)
+    listen 80;
+    server_name your.fqdn;
+
+    location / {
+        # redirect any requests to the same URL but on https
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    # listen on port 443 (https)
+    listen 443 ssl;
+    server_name your.fqdn;
+    root   /var/www/yourFQDNsite;
+    ssi on;
+
+    # location of the self-signed SSL certificate
+    ssl_certificate /etc/letsencrypt/live/your.fqdn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your.fqdn/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # write access and error logs to /var/log
+    access_log /var/log/fqdn_access.log;
+    error_log /var/log/fqdn_error.log;
+
+    # forward webhook requests to local webhooks server
+    # NOTE: trailing slash on location /hooks/ is IMPORTANT :(
+    location /hooks/ {
+        proxy_pass http://127.0.0.1:9000/hooks/;
+    }
+
+    location /mytrilog {
+        # forward application requests to the gunicorn server
+        proxy_pass http://127.0.0.1:8000;
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~ /.well-known/acme-challenge {
+      allow all;
+    }
+    location ~ ^/(README|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {
+      deny all;
+    }
+
+}
+```
+
+### create user account
+
+See
+[Miguel's _deploy on linux_ article](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux) 
+for notes on creating and securing this account. 
+He creates a user called 'ubuntu'. Below,
+I'll use `appuser` for the user that runs the app.
+
+### mysql setup
+
+Similar to 
+[Miguel's _deploy on linux_ article](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux), 
+except debian uses `mariadb`. 
+There's a nice
+[digital ocean guide to setting up mariadb on debian 10](https://www.digitalocean.com/community/tutorials/how-to-install-mariadb-on-debian-10). 
+
+After installing I set up the db:
+
+```
+$ sudo mysql -u root
+mysql> create database mytrilog character set utf8 collate utf8_bin;
+mysql> create user 'appuser'@'localhost' identified by 'dbpassword';
+mysql> grant all privileges on mytrilog.* to 'appuser'@'localhost';
+mysql> flush privileges;
+mysql> quit;
+```
+
+In the above, the 'dbpassword' string is what you put in your `.env` file,
+and `appuser` is the username you use to run the app and access the database.
+
+Here's a `.env` file for the above mariadb setup:
+
+```
+SECRET_KEY='a really long string of chars'
+MAIL_SERVER=your.fqdn
+DATABASE_URL=mysql+pymysql://appuser:dbpassword@127.0.0.1:3306/mytrilog
+ADMINS=['adminuser@your.fqdn']
+```
+
+### gunicorn
+
+This is the web server for the flask application. Use `pip` to install
+the gunicorn package into the flask virtual environment:
+
+```
+cd /notsurewhere
+git clone git@github.com:jeffknerr/mytrilog.git
+cd mytrilog
+vim .env         # add your env variables here
+apt-get install python3-venv
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+flask db upgrade
+pip install gunicorn
+```
+
+Note: I used `/notsurewhere` above because I was just showing how to install
+gunicorn in the venv. See full install details below for how I set up everything. You could
+make `/notsurewhere` be `/var/www`, but I don't think you want the whole git repo
+in `/var/www`...
+
+### supervisord
+
+Install the `supervisor` package and set up two config files
+in `/etc/supervisor/conf.d`:
+
+```
+$ cat mytrilog.conf
+[program:mytrilog]
+command=/var/www/mytrilog/venv/bin/gunicorn -b localhost:8000 -w 4 mytrilog:app
+directory=/var/www/mytrilog
+user=appuser
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+
+$ cat webhook.conf
+[program:webhook]
+command=/usr/bin/webhook -hooks hooks.json -verbose -port 9000
+directory=/somewhere/webhook
+user=appuser
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+```
+
+I'll explain the webhook next, and `/somewhere/webhook` is wherever you
+want to put the webhook scripts.
+
+Both of those configs just run daemons (gunicorn and webhook), and supervisord
+will take care of starting them at boot, and restarting them if needed.
+
+Not sure, but I might have also changed the permissions on the 
+`/var/run/supervisor.sock` file:
+
+```
+/etc/supervisor $ cat supervisord.conf
+
+[unix_http_server]
+file=/var/run/supervisor.sock   ; (the path to the socket file)
+chmod=0770                      ; sockef file mode (default 0700)
+chown=root:adm
+...
+...
+```
+
+### git webhook
+
+This part isn't needed to run the `mytrilog` app on your server. It's really
+only useful for me, if I update the repo. Might be useful for you if you 
+create your own app, based on this one, and want to set it up to auto-deploy 
+on a "git push". I'm really just putting my setup notes here so I can remember
+what I did next time...
+
+Install the webhook software:
+
+```
+sudo apt-get install webhook
+```
+
+See the 
+[webhook docs](https://github.com/adnanh/webhook)
+for all the details.
+
+I use `/somewhere/webhook` (e.g., `/var/www/webhook`) to store
+scripts that fire when the webhook is triggered, and also as the
+place to `git pull` the repo. Here's an overview of all that happens
+when I commit and push to the git repo:
+
+- github sends POST request to my payload URL: `https://your.fqdn/hooks/deploy-myapp`
+- nginx sees a request that starts with `/hooks` and proxy_passes it to webhook on port 9000
+- webhook sees the request, with the `deploy-myapp` id, and looks for a `/somewhere/webhook/hooks.json` file
+- in that json file is a deploy-myapp section that, if the secret is correct, fires a `/somewhere/webhook/deploy.sh` script I wrote
+- in `deploy.sh` I do a `git pull` and fire off a second script: `deployLocal`
+- finally, in `deployLocal`, I have everything needed to either start or upgrade the mytrilog app
+
+#### github webhook setup
+
+If you haven't already, you need ssh keys added to github to be
+able to push and pull. The `appuser` also needs to be able to pull
+the repo without needing a password.
+
+To set up the github webhook:
+
+- Settings
+- Webhooks
+- Add webhook
+- type in payload URL (see above)
+- Content type is `application/json`
+- add a Secret
+
+And here's the `hooks.json` file:
+
+```
+$ cat hooks.json
+[
+  {
+    "id": "deploy-myapp",
+    "execute-command": "/somewhere/webhook/deploy.sh",
+    "command-working-directory": "/somewhere/webhook",
+    "pass-arguments-to-command":
+    [
+      { "source": "payload", "name": "head_commit.message" },
+      { "source": "payload", "name": "pusher.name" },
+      { "source": "payload", "name": "head_commit.id" }
+    ],
+    "trigger-rule":
+    {
+      "and":
+      [
+        {
+          "match":
+          {
+            "type": "payload-hash-sha1",
+            "secret": "yourGithubSecret",
+            "parameter":
+            {
+              "source": "header",
+              "name": "X-Hub-Signature"
+            }
+          }
+        },
+        {
+          "match":
+          {
+            "type": "value",
+            "value": "refs/heads/master",
+            "parameter":
+            {
+              "source": "payload",
+              "name": "ref"
+            }
+          }
+        }
+      ]
+    }
+  },
+]
+```
+
+And here's my `deploy.sh` script:
+
+```
+$ cat deploy.sh
+#! /bin/bash -e
+
+PREFIX=/somewhere/webhook
+GHRDIR=${PREFIX}/mytrilog
+TMPFILE=${PREFIX}/debug.txt
+DEPLOY=${PREFIX}/deployLocal
+
+D=`date`
+touch $TMPFILE
+echo "---------------------------------" >> $TMPFILE
+echo $D >> $TMPFILE
+echo "---------------------------------" >> $TMPFILE
+
+function cleanup {
+     echo "Error occoured"
+     # !!Placeholder for Slack notification
+}
+trap cleanup ERR
+
+commit_message=$1   # head_commit.message
+pusher_name=$2      # pusher.name
+commit_id=$3        # head_commit.id
+
+${PREFIX}/gitpull >> $TMPFILE 2>&1
+# should do error checking???
+
+echo "---------------------------------" >> $TMPFILE
+echo "---------------------------------" >> $TMPFILE
+$DEPLOY >> $TMPFILE
+echo "---------------------------------" >> $TMPFILE
+echo "---------------------------------" >> $TMPFILE
+```
+
+And finally, here's my `deployLocal` script, which copies everything
+needed (and only what's needed) over to `/var/www/mytrilog`. It also
+tries to start and stop the app as needed when upgrading.
+
+```
+$ cat deployLocal
+#!/bin/bash
+
+# deploy from /somewhere to /var/www
+
+umask 0022
+
+NAME=mytrilog
+PREFIX=/somewhere/webhook
+REPO=${PREFIX}/$NAME
+WHERE=/var/www
+
+if [ -d $REPO ] ; then
+  cd $REPO
+else
+  echo "no $REPO directory???"
+  exit 1
+fi
+
+# stop
+supervisorctl stop $NAME
+
+# copy files
+rsync -aq --delete --exclude-from ${PREFIX}/sync-exclude ${REPO} $WHERE
+
+# check for venv file
+# make if it doesn't exist
+if [ ! -d ${WHERE}/${NAME}/venv ] ; then
+  cd ${WHERE}/${NAME}
+  python3 -m venv venv
+  # must be bash for source to work...
+  source ./venv/bin/activate
+  pip install -r ${REPO}/requirements.txt
+  pip install gunicorn
+  deactivate
+fi
+
+# check for .env file, cp in if it doesn't exist
+if [ ! -e ${WHERE}/${NAME}/.env ] ; then
+  cd ${WHERE}/${NAME}
+  cp ${PREFIX}/.env .
+fi
+
+# apply db upgrades, if any
+cd ${WHERE}/${NAME}
+source ./venv/bin/activate
+flask db upgrade
+deactivate
+
+# restart
+supervisorctl start $NAME
+```
+
+The `sync-exclude` file just contains things I don't want copied into
+`/var/www`, like the `.git` directory and this README.md file:
+
+```
+$ cat sync-exclude
+sync-exclude
+README.md
+.git
+.gitignore
+requirements.txt
+venv
+.env
+logs
+app.db
+app/translations
+screenshot.png
+```
+
+### static link
+
+I had to make a link from my main website back to the mytrilog/app/static dir.
+Not sure why.  Without that I couldn't get any static
+content (css, images) to show up on the web app.
+
+```
+cd /var/www/mywebsite
+ln -s /var/www/mytrilog/app/static/ static
+```
+
+### full install details
+
+Put all the commands here. Use this for the Quickstart section.
+Try it out on a test server and make sure it all works...
+
 
 ### stuff I always have to look up
 
 #### manually delete entry from db
 
 ```
-$ mysql -u username -p mytrilog
-Enter password:  (see enviro file)
+$ mysql -u appuser -p mytrilog
+Enter password:  (see .env file)
 Reading table information for completion of table and column names
 ...
 MariaDB [mytrilog]> show tables;
@@ -147,25 +586,22 @@ MariaDB [mytrilog]> select * from workout;
 +-----+------+---------------------+--------+--------+------+-------------------------------------+
 122 rows in set (0.000 sec)
 
-MariaDB [mytrilog]> delete from `workout` where `id` = 120;
+MariaDB [mytrilog]> delete from `workout` where `id` = 121;
 Query OK, 1 row affected (0.002 sec)
 
 MariaDB [mytrilog]> Bye
 ```
 
-#### auto-deploy
 
-- added webhook to server
-- added location and proxy_pass to nginx site enabled
-- using supervisord to start/stop webhook service
-- added webhook to github, also deploy key
-- git commit/push for repo triggers github webhook, which is seen 
-    by webhook service on server, and runs a deploy script (pull
-    the repo, rsync files to /var/www location, restart webapp)
-
-### Added Edit
+### added Edit option
 
 I added an Edit Workout option, for when I type in the wrong date or
 wrong workout "what". Thanks to Randall Degges for this page and help with the
 "edit" templates and links:
 [https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python](https://developer.okta.com/blog/2018/07/23/build-a-simple-crud-app-with-flask-and-python)
+
+### mail
+
+Note: my server already had a working postfix install, so I just used that 
+for the app's mail server. 
+
