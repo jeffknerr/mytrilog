@@ -172,6 +172,11 @@ def weightplot(user):
     response.mimetype = 'image/png'
     return response
 
+@bp.route('/ytd')
+@login_required
+def ytd():
+    return render_template('ytd.html', title='ytd')
+
 @bp.route('/ytdplot/<user>')
 @login_required
 def ytdplot(user):

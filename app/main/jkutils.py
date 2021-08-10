@@ -186,7 +186,7 @@ def makeYTDFigure(workouts,now,then):
     ax1.set_title("triathlon training data for %s to %s" % (tstr, nstr))
     myFmt = DateFormatter("%b %d")
     ax1.xaxis.set_major_formatter(myFmt)
-    width = 0.2           # the width of the bars
+    width = 1.0           # the width of the bars
     ax1.set_yticks(np.arange(0,ymax,10))
 
     p1 = ax1.bar(dates, swim, width, color='#3333ff')
