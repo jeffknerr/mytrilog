@@ -28,6 +28,7 @@ Features of the mytrilog app:
 - when logging workouts, date field uses 
 [Miguel's datetimepicker-example](https://gist.github.com/miguelgrinberg/5a1b3749dbe1bb254ff7a41e59cf04c9)
 - Stats page shows info for past 30 days (avg miles per week, avg weight)
+- YTD page showing year-to-date graphs
 - user can Edit a past workout, if data was entered incorrectly
 - plus all of the cool stuff from 
 [Miguel's tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
@@ -39,9 +40,7 @@ and just want this deployed in a subdirectory)
 
 Still to do:
 - finish writing the README
-x change master to main in git repo
 - add more to the Stats page
-- add YTD graph and stats
 - add unit testing!!
 - full code review...
 - write script to populate db with good fake data
@@ -164,8 +163,7 @@ where `gunicorn` is listening
 
 
 ```
-knerr@li1075-88 /etc/nginx/sites-enabled
-  $ cat your.fqdn
+/etc/nginx/sites-enabled$ cat your.fqdn
 
 server {
     # listen on port 80 (http)
