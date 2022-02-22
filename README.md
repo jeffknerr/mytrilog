@@ -408,7 +408,7 @@ $ cat hooks.json
           "match":
           {
             "type": "value",
-            "value": "refs/heads/master",
+            "value": "refs/heads/main",
             "parameter":
             {
               "source": "payload",
@@ -434,7 +434,7 @@ TMPFILE=${PREFIX}/debug.txt
 DEPLOY=${PREFIX}/deployLocal
 
 D=`date`
-touch $TMPFILE
+cat /dev/null > $TMPFILE
 echo "---------------------------------" >> $TMPFILE
 echo $D >> $TMPFILE
 echo "---------------------------------" >> $TMPFILE
@@ -526,13 +526,14 @@ sync-exclude
 README.md
 .git
 .gitignore
-requirements.txt
 venv
 .env
 logs
 app.db
 app/translations
 screenshot.png
+etc
+tests.py
 ```
 
 ### static link
