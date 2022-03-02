@@ -605,3 +605,60 @@ wrong workout "what". Thanks to Randall Degges for this page and help with the
 Note: my server already had a working postfix install, so I just used that 
 for the app's mail server. 
 
+## run in docker container???
+
+Assumes you already have docker set up and working on your
+local workstation. Also only tried this on an ubuntu linux computer.
+
+```
+mkdir docker-mytrilog
+cd docker-mytrilog
+git clone git@github.com:jeffknerr/mytrilog.git
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r mytrilog/requirements.txt
+flask db upgrade
+flask run
+```
+
+At this point you just have a version running at `localhost:5000/mytrilog`.
+
+```
+vim mytrilog/requirements.txt
+# add line for gunicorn
+vim Dockerfile
+FROM python:3.8-slim
+COPY ./mytrilog/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+COPY ./mytrilog/ /mytrilog
+WORKDIR /mytrilog
+CMD ["gunicorn", "-w", "2", "-b", ":8080", "mytrilog:app"]
+```
+
+Now build the image and run the container.
+
+```
+docker build -t "mytrilog" .
+docker run -d --name mytrilog -p 8080:8080 mytrilog
+```
+
+That should have a version running at `localhost:8080/mytrilog`.
+
+Some useful commands if things don't work:
+
+```
+docker rm d0c<TAB>
+docker rmi c89<TAB>
+# attach to container
+docker start -a 042678f863d5
+docker logs c062aa32e33d
+docker inspect c062aa32e33d
+# get into the image to look around, run commands manually
+docker run -it  --entrypoint /bin/bash mytrilog
+```
+
+Still to do:
+- persist the db file
+- add mysql in separate container
+- set it all up with a docker compose file
+
