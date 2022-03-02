@@ -657,8 +657,51 @@ docker inspect c062aa32e33d
 docker run -it  --entrypoint /bin/bash mytrilog
 ```
 
+## persist the db
+
+First, change the `config.py` file to use the sqlite db from it's
+own directory (I guess a docker volume has to be a directory, and
+can't be a file?).
+
+```
+$ cat mytrilog/config.db
+...
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+            'sqlite:///' + os.path.join(basedir, './testdb/app.db')
+...
+```
+
+and make that directory in the mytrilog source directory:
+
+```
+$ mkdir mytrilog/testdb
+```
+
+Now remake everything and attach the volume when you run the container:
+
+```
+$ docker stop mytrilog
+$ docker rm aa0<TAB>
+$ docker rmi 5b9<TAB>
+
+$ docker volume create app-db
+$ docker volume inspect app-db
+$ docker volume ls
+$ sudo ls -al /var/lib/docker/volumes/app-db
+$ docker build -t "mytrilog" .
+
+$ docker run -d --name mytrilog -p 8080:8080 -v app-db:/mytrilog/testdb mytrilog
+$ docker run -it  --entrypoint /bin/bash mytrilog
+$ docker ps
+```
+
+With the above you should be able to stop and start the container
+(even remove it and make a new one) and any users or workouts you
+added will still be there.
+
+
 Still to do:
-- persist the db file
 - add mysql in separate container
 - set it all up with a docker compose file
+
 
