@@ -1,5 +1,5 @@
 # mytrilog
-A web app to log triathlon workouts.
+A web app to log triathlon (and other) workouts.
 
 
 ## based on [The Flask Mega Tutorial by Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
