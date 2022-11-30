@@ -11,7 +11,7 @@ workouts, allowing the user to enter workouts (e.g., 2021-07-14 run 30 minutes)
 and see graphs showing progress and past workouts. The workouts also have an
 optional _weight_ component, if you want to track your weight vs time.
 
-## still (forever?) under construction
+## still (forever!) under construction
 
 I've got a working app now! Still very rough and klunky,
 but you can log workouts and see a graph and some stats.
