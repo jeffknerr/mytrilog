@@ -39,6 +39,8 @@ and just want this deployed in a subdirectory)
 
 
 Still to do:
+- YTD stats: add miles run
+- add an export-to-csv button for the data
 - finish writing the README
 - add more to the Stats page
 - add unit testing!!
