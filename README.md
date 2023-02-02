@@ -42,6 +42,7 @@ Still to do:
 - YTD stats: add miles run
 - add an export-to-csv button for the data
 - finish writing the README
+- add a DELETE workout option (in case two have same what)
 - add more to the Stats page
 - add unit testing!!
 - full code review...
