@@ -16,7 +16,7 @@ optional _weight_ component, if you want to track your weight vs time.
 I've got a working app now! Still very rough and klunky,
 but you can log workouts and see a graph and some stats.
 
-![mytrilog screenshot](screenshot.png)
+![mytrilog screenshot](screenshot.png "Jeff did lots of yoga that month...")
 
 Features of the mytrilog app:
 - allows user to enter run/bike/swim/xfit/yoga/rest workouts
@@ -707,3 +707,11 @@ Still to do:
 - add mysql in separate container
 - set it all up with a docker compose file
 
+# running unit tests
+
+```
+python -m pytest -v
+python -m pytest tests/unit
+python -m pytest tests/functional
+python -m pytest --cov=app
+```

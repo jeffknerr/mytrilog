@@ -2,45 +2,39 @@ from app.models import User, Workout
 
 # https://testdriven.io/blog/flask-pytest/
 
-def test_new_user():
+# would be nice to define the user data somewhere once,
+# so we don't have to repeat it here :(
+uname = "jk"
+mail = "jk@dummy.org"
+pw = "FlaskIsOK"
+badpw = "sdkfjlksdjfl"
+wdate = "2023-01-26"
+what = "xfit"
+amt = 30
+wgt = 160
+cmt="30x40/20"
+
+def test_new_user(new_user):
     """
-    GIVEN a User model
-    WHEN a new User is created
-    THEN check that the email, hashed_password, and email are good
+    check that the username, hashed_password, and email are good
     """
-    uname = "jk"
-    mail = "jk@dummy.org"
-    pw = "FlaskIsOK"
-    user = User(username=uname, email=mail)
-    user.set_password(pw)
-    assert user.email == mail
-    assert user.check_password(pw)
-    assert not user.check_password("sdjflksdjfkj")
-    assert user.username == uname
-    assert user.get_username() == uname
-    assert user.get_email() == mail
+    new_user.set_password(pw)
+    assert new_user.email == mail
+    assert new_user.check_password(pw)
+    assert not new_user.check_password(badpw)
+    assert new_user.username == uname
+    assert new_user.get_username() == uname
+    assert new_user.get_email() == mail
     u = User(username='john', email='john@example.com')
+    assert u.avatar(128) != 'https://www.gravatar.com/avatar/d4c74594d841136bd6?d=identicon&s=128'
     assert u.avatar(128) == 'https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?d=identicon&s=128'
 
-def test_new_workout():
+def test_new_workout(new_workout):
     """
-    GIVEN a Workout model
-    WHEN a new Workout is created
-    THEN check that the email, hashed_password, and role are defined correctly
+    check that the workout details are defined correctly
     """
-    uname = "jk"
-    mail = "jk@dummy.org"
-    wdate = "2023-01-26"
-    amt = 30
-    wgt = 160
-    user = User(username=uname, email=mail)
-    workout = Workout(what="xfit",
-                      when=wdate,
-                      amount=amt,
-                      weight=wgt,
-                      comment="30x40/20",
-                      athlete=user)
-    assert workout.what == "xfit"
-    assert workout.when == wdate
-    assert workout.amount == amt
-    assert workout.weight == wgt
+    assert new_workout.what == what
+    assert new_workout.when == wdate
+    assert new_workout.amount == amt
+    assert new_workout.weight == wgt
+    assert new_workout.comment == cmt

@@ -39,7 +39,8 @@ def index():
         form.what.data = "rest"
     page = request.args.get('page', 1, type=int)
     workouts = current_user.followed_workouts().paginate(
-        page, current_app.config['WORKOUTS_PER_PAGE'], False)
+        page=page, per_page=current_app.config['WORKOUTS_PER_PAGE'], 
+        error_out=False)
     next_url = url_for('main.index', page=workouts.next_num) if workouts.has_next else None
     prev_url = url_for('main.index', page=workouts.prev_num) if workouts.has_prev else None
 
@@ -59,7 +60,8 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
     workouts = user.workouts.order_by(Workout.when.desc()).paginate(
-        page, current_app.config['WORKOUTS_PER_PAGE'], False)
+        page=page, per_page=current_app.config['WORKOUTS_PER_PAGE'], 
+        error_out=False)
     next_url = url_for('main.user', username=user.username, page=workouts.next_num) if workouts.has_next else None
     prev_url = url_for('main.user', username=user.username, page=workouts.prev_num) if workouts.has_prev else None
     return render_template('user.html', user=user, workouts=workouts.items,
@@ -121,7 +123,8 @@ def unfollow(username):
 def explore():
     page = request.args.get('page', 1, type=int)
     workouts = Workout.query.order_by(Workout.when.desc()).paginate(
-                                      page, current_app.config['WORKOUTS_PER_PAGE'], False)
+        page=page, per_page=current_app.config['WORKOUTS_PER_PAGE'], 
+        error_out=False)
     next_url = url_for('main.explore', page=workouts.next_num) if workouts.has_next else None
     prev_url = url_for('main.explore', page=workouts.prev_num) if workouts.has_prev else None
     return render_template('index.html', title='Explore', workouts=workouts.items, 
@@ -204,7 +207,8 @@ def edit():
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
     workouts = user.workouts.order_by(Workout.when.desc()).paginate(
-        page, 5 + current_app.config['WORKOUTS_PER_PAGE'], False)
+        page=page, per_page=5+current_app.config['WORKOUTS_PER_PAGE'], 
+        error_out=False)
     next_url = url_for('main.edit', username=user.username, page=workouts.next_num) if workouts.has_next else None
     prev_url = url_for('main.edit', username=user.username, page=workouts.prev_num) if workouts.has_prev else None
     return render_template('edit.html', user=user, workouts=workouts.items,
