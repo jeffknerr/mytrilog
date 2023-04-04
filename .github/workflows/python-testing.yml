@@ -45,6 +45,9 @@ jobs:
       run: |
         source ./venv/bin/activate
         echo "VIRTENV: $VIRTUAL_ENV"
+        pwd
+        ls
+        ls ./app
         pytest
     - name: Test with unittest
       run: |
