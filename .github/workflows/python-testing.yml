@@ -47,7 +47,7 @@ jobs:
         echo "VIRTENV: $VIRTUAL_ENV"
         pwd
         python -c "import sys; print('\n'.join(sys.path))"
-        pytest
+        python -m pytest -v
     - name: Test with unittest
       run: |
         python tests.py
