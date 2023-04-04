@@ -34,7 +34,7 @@ jobs:
         source ./venv/bin/activate
         echo "VIRTENV: $VIRTUAL_ENV"
         pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements.txt ]; then pip install --upgrade pip; pip install -r requirements.txt; fi
 #   - name: Lint with flake8
 #     run: |
 #       # stop the build if there are Python syntax errors or undefined names
@@ -46,8 +46,7 @@ jobs:
         source ./venv/bin/activate
         echo "VIRTENV: $VIRTUAL_ENV"
         pwd
-        ls
-        ls ./app
+        python -c "import sys; print('\n'.join(sys.path))"
         pytest
     - name: Test with unittest
       run: |
