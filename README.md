@@ -1,5 +1,5 @@
 # mytrilog
-[![Tests Status](https://github.com/jeffknerr/mytrilog/tests-badge.svg?dummy=8484744)]
+[![Tests Status](https://github.com/jeffknerr/mytrilog/tests-badge.svg)]
 
 A web app to log triathlon (and other) workouts.
 
