@@ -20,6 +20,7 @@ class Config(object):
     ADMINS = os.environ.get('ADMINS')
     WORKOUTS_PER_PAGE = 5
 
+
 class ProductionConfig(Config):
     DEBUG = False
 
@@ -36,6 +37,8 @@ class DebugConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
+    DEBUG = True
+    ENV = "testing"
 
 
 # Load all possible configurations

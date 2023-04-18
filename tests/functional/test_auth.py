@@ -1,6 +1,7 @@
 
 import pytest
 from flask import session
+from flask import current_app
 from sqlalchemy import select
 from app.models import User
 from time import sleep
@@ -13,21 +14,34 @@ wdate = "2023-01-26"
 what = "xfit"
 amt = 30
 wgt = 160
-cmt="30x40/20"
+cmt = "30x40/20"
+
 
 def test_log_in_as_user(client, auth, app_with_db, app_with_user):
     """
-    GIVEN a Flask application configured for testing 
+    GIVEN a Flask application configured for testing
           (test user are created with app_with_user)
     WHEN the '/login' page is requested (POST) with VALID data
-    THEN check that the user can enter login page (page loaded - 200 status code)
-         check that existing user is successfully login (status 200)
-         check that user is successfully redirected to profile pageB
+    THEN check that the user can enter login page
+         check that existing user is successfully logged in
+         check that user is successfully redirected to profile page
     """
-    assert client.get('/mytrilog/auth/login').status_code == 200
+    cget = client.get('/mytrilog/auth/login')
+    assert cget.status_code == 200
+    print("\n", cget.status_code)
+    print("_"*30)
+    current_app.config["FOOFOO"] = 5
+#   for key in current_app.config.keys():
+#       print(key, current_app.config[key])
     response = auth.login("foofoo", "notavalidpw")
+#   print(response.text)
+    assert response.status_code == 200
     response = auth.login(uname, pw)
-    print(response.text)
+#   cget = client.get('/mytrilog/index')
+#   assert cget.status_code == 200
+#   print(response.text)
+    print(response.status_code)
+#   print(response.text)
     assert response.status_code == 200
 #   print("SLEEPING AFTER attempted login with pw....")
 #   sleep(45)
@@ -37,6 +51,9 @@ def test_log_in_as_user(client, auth, app_with_db, app_with_user):
 #   assert b"Log a workout?" in response.data
     # can we prove we are logged in here???
 #   assert response.request.path == '/mytrilog/index'
+    key = "FOOFOO"
+    print(key, current_app.config[key])
+    print(str(current_app.url_map))
 
 
 def test_logout_user(client, auth):
@@ -51,7 +68,7 @@ def test_logout_user(client, auth):
         # get index page
         client.get('/mytrilog/auth/login')
         # login to existing account
-        r = auth.login(uname, pw)
+        # r = auth.login(uname, pw)
         # print(r.data)  # shows the login page???
         # logout user
         response = auth.logout()
@@ -76,6 +93,7 @@ def test_login_page(test_client):
     assert b"Remember Me" in response.data
     assert b"New User?" in response.data
     assert b"Forgot Your Password?" in response.data
+
 
 def test_redir_to_login(test_client):
     """look for redirect to login page"""
