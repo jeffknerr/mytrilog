@@ -4,8 +4,8 @@ from app.models import User, Workout
 
 # would be nice to define the user data somewhere once,
 # so we don't have to repeat it here :(
-uname = "jk"
-mail = "jk@dummy.org"
+uname = "jk2756"
+mail = "jk2756@dummy.org"
 pw = "FlaskIsOK"
 badpw = "sdkfjlksdjfl"
 wdate = "2023-01-26"

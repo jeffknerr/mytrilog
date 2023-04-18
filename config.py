@@ -19,3 +19,28 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = os.environ.get('ADMINS')
     WORKOUTS_PER_PAGE = 5
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+    # Security
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_DURATION = 3600
+
+
+class DebugConfig(Config):
+    DEBUG = True
+
+
+class TestingConfig(Config):
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+
+
+# Load all possible configurations
+config_dict = {
+    'Production': ProductionConfig,
+    'Debug': DebugConfig,
+    'Test': TestingConfig
+}
