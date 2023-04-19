@@ -2,13 +2,17 @@
 
 from datetime import datetime, timedelta
 import unittest
+import re
 from app import create_app, db
 from app.models import User, Workout
 from config import Config
 
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    WTF_CSRF_ENABLED = False
+
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -16,11 +20,99 @@ class UserModelCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        self.client = self.app.test_client(use_cookies=True)
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
+    def test_home_page(self):
+        response = self.client.get('/mytrilog/auth/login')
+        self.assertTrue('Sign In' in response.get_data(as_text=True))
+        self.assertTrue('New User?' in response.get_data(as_text=True))
+
+    def test_register_login_logout(self):
+        tdata = {
+                'uname': "jk2756",
+                'mail': "jk2756@dummy.org",
+                'pw': "FlaskIsOK",
+                }
+        # register new account
+        response = self.client.post('/mytrilog/auth/register',
+                                    data={'username': tdata['uname'],
+                                          'email': tdata['mail'],
+                                          'password': tdata['pw'],
+                                          'password2': tdata['pw'],
+                                          }
+                                    )
+        self.assertTrue(response.status_code == 302)
+        # log in with new account
+        response = self.client.post('/mytrilog/auth/login',
+                                    data={'username': tdata['uname'],
+                                          'password': tdata['pw'],
+                                          },
+                                    follow_redirects=True
+                                    )
+        pagedata = response.get_data(as_text=True)
+        sstr = "Hello,%s%s!" % ("\\s", tdata['uname'])
+        self.assertTrue(re.search(sstr, pagedata))
+        self.assertTrue("Log a workout?" in pagedata)
+        # log out
+        response = self.client.get('/mytrilog/auth/logout',
+                                   follow_redirects=True
+                                   )
+        pagedata = response.get_data(as_text=True)
+        self.assertTrue("Please log in to access this page." in pagedata)
+        self.assertTrue("Sign In" in pagedata)
+
+    def test_log_workout(self):
+        tdata = {
+                'uname': "jk2757",
+                'mail': "jk2757@dummy.org",
+                'pw': "FlaskIsOKay",
+                'wdate': "2023-01-26",
+                'what': "xfit",
+                'amt': 30,
+                'wgt': 160,
+                'cmt': "30x40/20",
+                }
+        # register new account
+        response = self.client.post('/mytrilog/auth/register',
+                                    data={'username': tdata['uname'],
+                                          'email': tdata['mail'],
+                                          'password': tdata['pw'],
+                                          'password2': tdata['pw'],
+                                          }
+                                    )
+        self.assertTrue(response.status_code == 302)
+        # log in with new account
+        response = self.client.post('/mytrilog/auth/login',
+                                    data={'username': tdata['uname'],
+                                          'password': tdata['pw'],
+                                          },
+                                    follow_redirects=True
+                                    )
+        pagedata = response.get_data(as_text=True)
+        sstr = "Hello,%s%s!" % ("\\s", tdata['uname'])
+        self.assertTrue(re.search(sstr, pagedata))
+        self.assertTrue("Log a workout?" in pagedata)
+        # log a workout
+        response = self.client.post('/mytrilog/index',
+                                    data={'what': tdata['what'],
+                                          'when': tdata['wdate'],
+                                          'amount': tdata['amt'],
+                                          'weight': tdata['wgt'],
+                                          'comment': tdata['cmt'],
+                                          },
+                                    follow_redirects=True
+                                    )
+        pagedata = response.get_data(as_text=True)
+        sstr = "Hello,%s%s!" % ("\\s", tdata['uname'])
+        self.assertTrue(re.search(sstr, pagedata))
+        self.assertTrue("Logged your workout!" in pagedata)
+        self.assertTrue(tdata["cmt"] in pagedata)
+        self.assertTrue(tdata["what"] in pagedata)
 
     def test_password_hashing(self):
         u = User(username='susan')
@@ -90,6 +182,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(f2, [p2, p3])
         self.assertEqual(f3, [p3, p4])
         self.assertEqual(f4, [p4])
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
