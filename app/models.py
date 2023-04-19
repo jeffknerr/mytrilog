@@ -77,7 +77,7 @@ class User(UserMixin, db.Model):
             id = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
         except:
             return
-        return User.query.get(id)
+        return db.session.get(User, int(id))
 
 
 class Workout(db.Model):
@@ -94,7 +94,8 @@ class Workout(db.Model):
         return '<Workout {} {} {}>'.format(self.what,self.amount,self.when)    
 
     def getUsername(self):
-        return User.query.get(self.who).username
+        u = db.session.get(User, self.who)
+        return u.username
 
     def getDOM(self):
         """get day of month"""
@@ -116,4 +117,4 @@ class Workout(db.Model):
 
 @login.user_loader
 def load_user(id):
-      return User.query.get(int(id))
+      return db.session.get(User, int(id))
