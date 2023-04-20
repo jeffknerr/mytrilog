@@ -63,7 +63,9 @@ class UserModelCase(unittest.TestCase):
                                    follow_redirects=True
                                    )
         pagedata = response.get_data(as_text=True)
-        self.assertTrue("Please log in to access this page." in pagedata)
+        self.assertTrue("Remember Me" in pagedata)
+        self.assertTrue("New User?" in pagedata)
+        self.assertTrue("Forgot Your Password?" in pagedata)
         self.assertTrue("Sign In" in pagedata)
 
     def test_log_workout(self):
