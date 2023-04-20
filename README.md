@@ -712,8 +712,21 @@ Still to do:
 # running unit tests
 
 ```
+# pytest
+python -m pytest
+# pytest with verbosity
 python -m pytest -v
+# if you need to see print() output
+python -m pytest -v -s
+# just run specific tests
 python -m pytest tests/unit
 python -m pytest tests/functional
+# look at coverage
 python -m pytest --cov=app
+```
+
+## if you need to debug
+
+```
+flask --app mytrilog --debug run
 ```

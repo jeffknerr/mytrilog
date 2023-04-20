@@ -53,7 +53,6 @@ async def app_with_db(app):
 def app_with_user(app_with_db):
     new_user = NewUser(username=uname, email=mail)
     new_user.set_password(pw)
-    current_app.config["NEWVAR"] = 42
     # add the new user to the database
     _db.session.add(new_user)
     _db.session.commit()
@@ -65,7 +64,7 @@ def app_with_user(app_with_db):
 
 @pytest.fixture()
 def client(app, app_with_db):
-    return app.test_client()
+    return app.test_client(use_cookies=True)
 
 
 @pytest.fixture()
@@ -79,9 +78,10 @@ class AuthActions(object):
         self._client = client
 
     def login(self, uname, pw):
+        # data {} must match the app form parameters
         retval = self._client.post(
             '/mytrilog/auth/login',
-            data={'uname': uname, 'pw': pw},
+            data={'username': uname, 'password': pw},
             follow_redirects=True
         )
         print("retval:", retval.status_code)

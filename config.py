@@ -19,6 +19,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = os.environ.get('ADMINS')
     WORKOUTS_PER_PAGE = 5
+    DEBUG = True
 
 
 class ProductionConfig(Config):
