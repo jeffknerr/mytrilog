@@ -44,6 +44,7 @@ jobs:
     - name: Test with pytest
       run: |
         source ./venv/bin/activate
+        flask db upgrade
         echo "VIRTENV: $VIRTUAL_ENV"
         pwd
         python -c "import sys; print('\n'.join(sys.path))"
@@ -51,5 +52,6 @@ jobs:
     - name: Test with unittest
       run: |
         source ./venv/bin/activate
+        flask db upgrade
         python tests.py
 
