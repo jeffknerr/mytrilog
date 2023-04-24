@@ -1,5 +1,6 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 # install Python dependencies, run tests and lint with a variety of Python versions
+# https://github.com/DarekRepos/quiz-roads/blob/master/.github/workflows/workflow.yml
 
 name: python testing
 
@@ -33,7 +34,7 @@ jobs:
         python -m venv venv
         source ./venv/bin/activate
         echo "VIRTENV: $VIRTUAL_ENV"
-        pip install flake8 pytest
+        pip install flake8 pytest coverage
         if [ -f requirements.txt ]; then pip install --upgrade pip; pip install -r requirements.txt; fi
 #   - name: Lint with flake8
 #     run: |
@@ -45,10 +46,11 @@ jobs:
       run: |
         source ./venv/bin/activate
         flask db upgrade
-        echo "VIRTENV: $VIRTUAL_ENV"
-        pwd
         python -c "import sys; print('\n'.join(sys.path))"
         python -m pytest -v
+        genbadge tests -o ./reports/coverage/coverage-unit-badge.svg
+        coverage xml
+        genbadge coverage -i ./coverage.xml -o ./reports/coverage/coverage-badge.svg
     - name: Test with unittest
       run: |
         source ./venv/bin/activate
