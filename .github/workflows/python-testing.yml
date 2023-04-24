@@ -50,7 +50,7 @@ jobs:
         python -m pytest -v
         coverage run -m pytest
         coverage report -m
-        pytest --junitxml=reports/junit/junit.xml
+        python -m pytest --junitxml=reports/junit/junit.xml
         genbadge tests -o ./reports/coverage/coverage-unit-badge.svg
         coverage xml
         coverage html
