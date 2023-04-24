@@ -729,6 +729,18 @@ python -m pytest tests/functional
 python -m pytest --cov=app
 ```
 
+## generate badges
+
+```
+python -m pytest
+coverage run -m pytest
+coverage report -m
+python -m pytest --junitxml=reports/junit/junit.xml
+genbadge tests -o ./badges/tests-badge.svg
+coverage xml
+genbadge coverage -i ./coverage.xml -o ./badges/coverage-badge.svg
+```
+
 ## if you need to debug
 
 ```

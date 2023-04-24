@@ -18,14 +18,6 @@ cmt = "30x40/20"
 
 
 def test_log_in_as_user(client, auth, app_with_user):
-    """
-    GIVEN a Flask application configured for testing
-          (test user are created with app_with_user)
-    WHEN the '/login' page is requested (POST) with VALID data
-    THEN check that the user can enter login page
-         check that existing user is successfully logged in
-         check that user is successfully redirected to profile page
-    """
     # check main login page
     cget = client.get('/mytrilog/auth/login')
     assert cget.status_code == 200
