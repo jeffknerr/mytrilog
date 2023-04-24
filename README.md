@@ -2,6 +2,9 @@
 ![Tests Status](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/badges/tests-badge.svg)
 ![Coverage](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/badges/coverage-badge.svg)
 
+![Tests](https://github.com/jeffknerr/mytrilog/actions/workflows/python-testing.yml/tests-badge.svg)
+![Coverage](https://github.com/jeffknerr/mytrilog/actions/workflows/python-testing.yml/coverage-badge.svg)
+
 A web app to log triathlon (and other) workouts.
 
 
