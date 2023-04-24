@@ -1,5 +1,7 @@
 # mytrilog
-![Tests Status](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/tests-badge.svg)
+![Tests Status](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/badges/tests-badge.svg)
+![Tests](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/badges/coverage-unit-badge.svg)
+![Coverage](https://raw.githubusercontent.com/jeffknerr/mytrilog/main/badges/coverage-badge.svg)
 
 A web app to log triathlon (and other) workouts.
 
