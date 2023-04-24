@@ -34,7 +34,7 @@ jobs:
         python -m venv venv
         source ./venv/bin/activate
         echo "VIRTENV: $VIRTUAL_ENV"
-        pip install flake8 pytest coverage
+        pip install flake8 pytest coverage genbadge[all]
         if [ -f requirements.txt ]; then pip install --upgrade pip; pip install -r requirements.txt; fi
 #   - name: Lint with flake8
 #     run: |
