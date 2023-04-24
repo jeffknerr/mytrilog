@@ -63,7 +63,9 @@ def test_about(client, auth, app_with_user):
     # now go to About page
     response = client.get("/mytrilog/about")
     assert response.status_code == 200
-    bstr = "This is the start of Jeff's training log app...".encode('utf-8')
+    bstr = "This is the start of".encode('utf-8')
+    assert bstr in response.data
+    bstr = "Jeff's triathlon training log app".encode('utf-8')
     assert bstr in response.data
     # now log out
     response = auth.logout()
