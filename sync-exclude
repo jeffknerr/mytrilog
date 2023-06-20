@@ -1,0 +1,16 @@
+sync-exclude
+README.md
+.git
+.github
+.gitignore
+venv
+.env
+logs
+app.db
+app/translations
+screenshot.png
+etc
+tests.py
+tests
+badges
+vagrant
