@@ -103,3 +103,68 @@ vg destroy flask
 $ export ANSIBLE_NOCOWS=1
 vg up
 ```
+
+## play with the db
+
+After the app was up and running, I registered a new user (Sammy)
+and logged two workouts. Here's how to look in the db to see
+the results:
+
+```
+$ vg ssh flask
+Last login: Wed Jun 21 15:32:32 2023 from 192.168.56.1
+vagrant@flask:~$ sudo mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 37
+Server version: 10.5.19-MariaDB-0+deb11u2 Debian 11
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| mytrilog           |
+| performance_schema |
++--------------------+
+4 rows in set (0.011 sec)
+
+MariaDB [(none)]> use mytrilog;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [mytrilog]> show tables;
++--------------------+
+| Tables_in_mytrilog |
++--------------------+
+| alembic_version    |
+| followers          |
+| user               |
+| workout            |
++--------------------+
+4 rows in set (0.001 sec)
+
+MariaDB [mytrilog]> select * from user;
++----+----------+----------------------+--------------------------------------------------------------------------------------------------------+----------+---------------------+
+| id | username | email                | password_hash                                                                                          | about_me | last_seen           |
++----+----------+----------------------+--------------------------------------------------------------------------------------------------------+----------+---------------------+
+|  1 | Sammy    | jk@cs.swarthmore.edu | pbkdf2:sha256:600000$1dw0kK5Yh048lIuH$55c043789c133a103e763b14c5747197d1e95306d259f2b23223be99a685961d | NULL     | 2023-06-21 15:48:04 |
++----+----------+----------------------+--------------------------------------------------------------------------------------------------------+----------+---------------------+
+1 row in set (0.001 sec)
+
+MariaDB [mytrilog]> select * from workout;
++----+------+---------------------+--------+--------+------+-----------------+
+| id | what | when                | amount | weight | who  | comment         |
++----+------+---------------------+--------+--------+------+-----------------+
+|  1 | swim | 2023-06-21 00:00:00 |     10 |     65 |    1 | in creek        |
+|  2 | run  | 2023-06-18 00:00:00 |     28 |   NULL |    1 | down the street |
++----+------+---------------------+--------+--------+------+-----------------+
+2 rows in set (0.001 sec)
+
+MariaDB [mytrilog]>
+```
