@@ -1,7 +1,14 @@
 
-# create test Vm using ansible and vagrant
+# create test VM using ansible and vagrant
 
-Copied/stolen from 
+Below is a way to run a test server of this flask app,
+if you just want to try it out. It should install a VM
+that runs the flask app and a mysql/mariadb database, and
+uses nginx to server the app. The server has a self-signed
+SSL cert, so it works with https, but you have to ignore
+the browser warnings and "proceed to the site"...
+
+Copied/stolen/modified from 
 [Jeff Geerling's *ansible-for-devops* repo](https://github.com/geerlingguy/ansible-for-devops/blob/master/drupal/provisioning/playbook.yml)
 
 ## install vagrant and ansible
@@ -87,6 +94,8 @@ $ ansible-playbook playbook.yml
 
 
 ## redo it all
+
+If you want to start with a fresh copy...
 
 ```
 vg halt flask
