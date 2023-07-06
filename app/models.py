@@ -88,7 +88,7 @@ class Workout(db.Model):
     amount = db.Column(db.Float, default=0)
     weight = db.Column(db.Float)
     who = db.Column(db.Integer, db.ForeignKey('user.id'))
-    comment = db.Column(db.String(140))
+    comment = db.Column(db.String(40))
 
     def __repr__(self):
         return '<Workout {} {} {}>'.format(self.what,self.amount,self.when)    

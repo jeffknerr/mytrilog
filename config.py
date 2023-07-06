@@ -20,6 +20,10 @@ class Config(object):
     ADMINS = os.environ.get('ADMINS')
     WORKOUTS_PER_PAGE = 5
     DEBUG = True
+    RECAPTCHA_USE_SSL=os.environ.get('RECAPTCHA_USE_SSL')
+    RECAPTCHA_PUBLIC_KEY=os.environ.get('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY=os.environ.get('RECAPTCHA_PRIVATE_KEY')
+    RECAPTCHA_OPTIONS=os.environ.get('RECAPTCHA_OPTIONS')
 
 
 class ProductionConfig(Config):
@@ -29,7 +33,6 @@ class ProductionConfig(Config):
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_DURATION = 3600
-
 
 class DebugConfig(Config):
     DEBUG = True

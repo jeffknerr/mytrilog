@@ -26,6 +26,13 @@ class EditProfileForm(FlaskForm):
             if user is not None:
                 raise ValidationError('Please use a different username.')
 
+    def validate_about_me(self, field):
+        excluded_chars = "*'^|&#$"
+        excluded_chars += '"'
+        for char in field.data:
+            if char in excluded_chars:
+                raise ValidationError(f"Character {char} is not allowed")
+
 
 class WorkoutForm(FlaskForm):
     wkts = "run bike swim xfit rest yoga".split()
@@ -36,8 +43,15 @@ class WorkoutForm(FlaskForm):
     when = DateField(id='datepick', format='%Y-%m-%d', default=date.today)
     amount = FloatField(default=0)
     weight = FloatField('Weight (optional)', validators=[Optional()])
-    comment = TextAreaField('Comments?', validators=[Length(min=0, max=140)])
+    comment = TextAreaField('Comments?', validators=[Length(min=0, max=40)])
     submit = SubmitField('Log it!')
+
+    def validate_comment(self, field):
+        excluded_chars = "*'^|&#$"
+        excluded_chars += '"'
+        for char in field.data:
+            if char in excluded_chars:
+                raise ValidationError(f"Character {char} is not allowed")
 
 
 class ChangeWorkoutForm(WorkoutForm):
