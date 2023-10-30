@@ -1,3 +1,7 @@
+aws/terraform/.terraform*
+aws/terraform/terraform.tfstate*
+aws/terraform/terraform.tfvars
+
 a.out
 credentials.csv
 *.o 
