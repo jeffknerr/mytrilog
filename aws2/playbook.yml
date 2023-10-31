@@ -1,0 +1,223 @@
+---
+- hosts: awsinstance
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Update apt cache if needed.
+      apt: update_cache=yes cache_valid_time=3600
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+    - name: restart supervisor
+      service: name=supervisor state=restarted
+
+  tasks:
+    - name: Get software for apt repository management.
+      apt:
+        state: present
+        name:
+          - python3-apt
+          - python3-pycurl
+
+    - name: install db, nginx, and other stuff
+      apt:
+        state: present
+        name:
+          - acl
+          - git
+          - curl
+          - unzip
+          - postfix
+          - nginx
+          - python3-mysqldb
+          - python3-venv
+          - python3-virtualenv
+          - mariadb-server
+          - certbot
+          - tree
+          - nmap
+          - tldr
+          - fish
+          - zsh
+          - gnutls-bin
+          - ssl-cert
+          - links
+          - sudo
+          - supervisor
+
+    - name: Ensure a locale exists
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+
+    - name: "Start nginx, MySQL"
+      service: "name={{ item }} state=started enabled=yes"
+      with_items:
+        - nginx
+        - mysql
+# above fails if nginx config is wonky...
+
+    - name: Create a MySQL database for mytrilog.
+      mysql_db: "db={{ domain }} state=present"
+
+    - name: Create a MySQL user for mytrilog.
+      mysql_user:
+        name: "{{ app_user }}"
+        password: "{{dbpw}}"
+        priv: "{{ domain }}.*:ALL"
+        host: localhost
+        state: present
+
+    - name: Ensure mytrilog var www directory exists.
+      file:
+        path: "{{ app_path }}"
+        state: directory
+        owner: "{{app_user}}"
+        group: "{{app_user}}"
+        mode: 0755
+
+    - name: Git checkout knerr mytrilog
+      ansible.builtin.git:
+        repo: 'https://github.com/jeffknerr/mytrilog.git'
+        dest: /home/{{app_user}}/mytrilog
+    - name: rsync stuff over to var www
+      ansible.builtin.command:
+        cmd: /usr/bin/rsync -aq --delete --exclude-from ./{{domain}}/sync-exclude ./{{domain}} /var/www
+        chdir: /home/{{app_user}}
+    - name: install virtual env
+      ansible.builtin.pip:
+        requirements: /var/www/{{domain}}/requirements.txt
+        virtualenv: /var/www/{{domain}}/venv
+        virtualenv_command: /usr/bin/python3 -m venv
+# add gunicorn
+    - name: add gunicorn to venv
+      ansible.builtin.pip:
+        name: gunicorn
+        virtualenv: /var/www/{{domain}}/venv
+# add .env file
+    - name: template env file
+      template:
+        src: envfile.j2
+        dest: /var/www/{{domain}}/.env
+        owner: root
+        group: root
+        mode: 0640
+# flask db upgrade in the venv
+    - name: cp upgrade shell script
+      copy:
+        src: dbupgrade.sh
+        dest: /home/{{app_user}}/dbupgrade.sh
+        owner: root
+        group: root
+        mode: 0755
+    - name: run flask db upgrade
+      ansible.builtin.command: 
+        cmd: /home/{{app_user}}/dbupgrade.sh
+    - name: chown everything to {{app_user}}
+      file:
+        path: /var/www/{{domain}}
+        owner: "{{app_user}}"
+        group: "{{app_user}}"
+        recurse: yes
+
+# create self-signed cert
+    - name: ssc generate privkey
+      community.crypto.openssl_privatekey:
+        path: /etc/ssl/private/myCAkey.pem
+    - name: ssc cp ca.info file
+      copy:
+        src: ca.info
+        dest: /etc/ssl/ca.info
+        mode: 0644
+    - name: create self-signed CS certificate
+      ansible.builtin.command: 
+        cmd: certtool --generate-self-signed --load-privkey /etc/ssl/private/myCAkey.pem --template /etc/ssl/ca.info --outfile /usr/local/share/ca-certificates/mycacert.crt
+        creates: /usr/local/share/ca-certificates/mycacert.crt
+    - name: run update ca certs command
+      ansible.builtin.command: 
+        cmd: /usr/sbin/update-ca-certificates
+    - name: ssc generate server privkey
+      community.crypto.openssl_privatekey:
+        size: 2048
+        path: /etc/ssl/private/nginx-selfsignedkey.pem
+    - name: ssc cp flask.info template file
+      copy:
+        src: flask.info
+        dest: /etc/ssl/flask.info
+        mode: 0644
+    - name: create server cert
+      ansible.builtin.command: 
+        cmd: certtool --generate-certificate --load-privkey /etc/ssl/private/nginx-selfsignedkey.pem --load-ca-certificate /etc/ssl/certs/mycacert.pem --load-ca-privkey /etc/ssl/private/myCAkey.pem --template /etc/ssl/flask.info --outfile /etc/ssl/certs/nginx-selfsigned.pem
+        creates: /etc/ssl/certs/nginx-selfsigned.pem
+    - name: change ssc key ownership group perms
+      ansible.builtin.file:
+        path: /etc/ssl/certs/nginx-selfsigned.pem
+        owner: root
+        group: www-data
+        mode: '0640'
+# cp files
+    - name: ssc cp nginx dhparam file
+      copy:
+        src: dhparam.pem
+        dest: /etc/nginx/dhparam.pem
+        mode: 0644
+    - name: ssc cp ssl params file
+      copy:
+        src: ssl-params.conf
+        dest: /etc/nginx
+        mode: 0644
+      notify: 'restart nginx'
+    - name: template cp flask.test nginx site file
+      template:
+        src: flask.test.j2
+        dest: /etc/nginx/sites-available/flask.test
+        owner: root
+        group: root
+        mode: 0644
+      notify: 'restart nginx'
+# enable new ssl site
+    - name: enable flask site
+      file:
+        src: /etc/nginx/sites-available/flask.test
+        dest: /etc/nginx/sites-enabled/flask.test
+        state: link
+      notify: 'restart nginx'
+# disable default site
+    - name: disable the default site 
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: 'restart nginx'
+# set up supervisord
+    - name: cp supervisord conf file
+      template:
+        src: "{{domain}}.conf.j2"
+        dest: /etc/supervisor/conf.d/{{domain}}.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: 'restart supervisor'
+
+# fix locale and motd
+    - name: reconfig locales
+      ansible.builtin.command: 
+        cmd: dpkg-reconfigure --frontend noninteractive locales
+    - name: get IP address from terraform
+      become: no
+      ansible.builtin.command: 
+        cmd: terraform output
+      delegate_to: localhost
+      register: results
+    - name: Show results
+      debug:
+        var: results.stdout
+      delegate_to: localhost
+    - name: set motd file
+      copy:
+         content: "\n aws instance {{ results.stdout }} \n"
+         dest: "/etc/motd"
+...

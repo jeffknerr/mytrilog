@@ -6,10 +6,10 @@ and some from this page:
 https://www.kevinlondon.com/2016/09/20/devops-from-scratch-pt-2
 
 Prerequisites (and versions used here):
-- running these commands on ubuntu 22.04
+- running these commands on ubuntu 22.04 (jammy)
 - have vagrant installed (v2.3.4)
 - have terraform installed (v1.4.5)
-- have ansible installed (v8.5.0)
+- have ansible installed (v2.14.5)
 - have aws cli installed (v2.11.11)
 - have ssh key for aws already set up
 - have aws keys already set up and in ~/.aws files
@@ -156,3 +156,4 @@ $ terraform destroy
 ## todo
 
 - get the IP and immediately run the playbook, all from terraform...
+
