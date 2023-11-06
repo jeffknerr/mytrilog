@@ -32,8 +32,6 @@ $ sudo apt-get install gnupg software-properties-common
 $ sudo apt-get install ansible vagrant git virtualbox
 $ sudo vim /etc/ansible/hosts
 $ cat /etc/ansible/hosts
-- install vagrant
-- install ansible
 $ vim edit /etc/ansible/hosts
 [flask]
 192.168.56.10
