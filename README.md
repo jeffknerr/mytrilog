@@ -92,6 +92,35 @@ Also, `SECRET_KEY` is just used by Flask for security (set it to something
 besides "your-secret-key-here"), and `ADMINS` is a list of string email addresses
 for site admins (they get emails when things go wrong).
 
+---
+
+reCAPTCHA note: I added reCAPTCHA to discourage bots from registering.
+The `.env` file now looks something like this:
+
+```
+SECRET_KEY=your-secret-key-here
+MAIL_SERVER=your.mailserver.net
+ADMINS=["user@yourserver.net"]
+RECAPTCHA_USE_SSL=False
+RECAPTCHA_PUBLIC_KEY='your_public_key_from_google'
+RECAPTCHA_PRIVATE_KEY='your_private_key_from_google'
+RECAPTCHA_OPTIONS={'theme':'black'}
+```
+
+Here's the tutorial I followed to add reCAPTCHA:
+https://pusher.com/tutorials/google-recaptcha-flask/#create-your-virtual-environment-using-virtualenv
+
+The basic steps to registering a site to use reCAPTCHA are:
+- go to https://www.google.com/recaptcha/admin/create
+- type in a label
+- select v2
+- enter domain
+- click on SUBMIT button
+
+That should get you the public and private keys you need for the `.env` file.
+
+---
+
 Next install flask and everything needed in the virtual environment:
 
 ```
@@ -620,9 +649,11 @@ local workstation. Also only tried this on an ubuntu linux computer.
 mkdir docker-mytrilog
 cd docker-mytrilog
 git clone git@github.com:jeffknerr/mytrilog.git
+cd mytrilog
 python3 -m venv venv
 source ./venv/bin/activate
 pip install -r mytrilog/requirements.txt
+# edit an appropriate .env file (see above)
 flask db upgrade
 flask run
 ```
@@ -630,8 +661,10 @@ flask run
 At this point you just have a version running at `localhost:5000/mytrilog`.
 
 ```
+# back up in the docker-mytrilog dir
 vim mytrilog/requirements.txt
-# add line for gunicorn
+# add line for gunicorn, something like this:
+#gunicorn==20.1.0
 vim Dockerfile
 FROM python:3.8-slim
 COPY ./mytrilog/requirements.txt /tmp/requirements.txt
@@ -641,7 +674,8 @@ WORKDIR /mytrilog
 CMD ["gunicorn", "-w", "2", "-b", ":8080", "mytrilog:app"]
 ```
 
-Now build the image and run the container.
+Now build the image and run the container (don't forget the dot (.) at then end
+of the `docker build` line).
 
 ```
 docker build -t "mytrilog" .
