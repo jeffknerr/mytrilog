@@ -1,0 +1,7 @@
+.vagrant
+.terraform*
+terraform.tfvars
+terraform.tf*
+inventory
+recaptcha.yml
+register.yml

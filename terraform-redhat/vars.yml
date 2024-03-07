@@ -1,0 +1,7 @@
+---
+# flask app variables
+app_path: "/var/www/mytrilog"
+app_user: "ec2-user"
+domain: "mytrilog"
+dbpw: "1234pw"
+...

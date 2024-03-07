@@ -1,0 +1,8 @@
+[program:{{domain}}]
+command=/var/www/{{domain}}/venv/bin/gunicorn -b localhost:8000 -w 4 {{domain}}:app
+directory=/var/www/{{domain}}
+user={{app_user}}
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true

@@ -1,0 +1,8 @@
+SECRET_KEY=your-secret-key-here
+MAIL_SERVER=flask.test
+DATABASE_URL=mysql+pymysql://{{app_user}}:{{dbpw}}@127.0.0.1:3306/{{domain}}
+ADMINS=['admin@flask.test']
+RECAPTCHA_USE_SSL=False
+RECAPTCHA_PUBLIC_KEY='{{recaptcha_pubkey}}'
+RECAPTCHA_PRIVATE_KEY='{{recaptcha_privkey}}'
+RECAPTCHA_OPTIONS={'theme':'black'}

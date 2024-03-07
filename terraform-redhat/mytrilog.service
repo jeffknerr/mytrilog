@@ -1,0 +1,12 @@
+[Unit]
+Description=mytrilog web application
+After=network.target
+
+[Service]
+User=ec2-user
+WorkingDirectory=/var/www/mytrilog
+ExecStart=/var/www/mytrilog/venv/bin/gunicorn -b localhost:8000 -w 4 mytrilog:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,206 @@
+---
+- hosts: awsinstance
+  become: yes
+
+  vars_files:
+    - vars.yml
+    - recaptcha.yml
+    - register.yml
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+
+  tasks:
+
+# not good for production...just for testing
+    - name: Ensure SELinux is set to permissive mode
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: SELINUX=permissive
+    - name: change SELinux to permissive for testing
+      ansible.builtin.command: 
+        cmd: setenforce permissive
+      notify: 'restart nginx'
+
+    # register system with redhat
+    - name: register with redhat developer acct
+      ansible.builtin.command: 
+        cmd: subscription-manager register --username {{redhat_username}} --password {{redhat_password}}
+
+    # turn off firewall?? sshguard?? SELINUX?? fail2ban??
+    
+    - name: Get software for yum repository management.
+      yum:
+        update_cache: true
+        state: present
+        name:
+          - python3-pycurl
+
+    - name: install db, nginx, and other stuff
+      yum:
+        state: present
+        update_cache: true
+        name:
+          - acl
+          - git
+          - vim
+          - curl
+          - unzip
+          - postfix
+          - nginx
+          - python3-PyMySQL
+          - mariadb-server
+          - tree
+          - nmap
+          - zsh
+          - sudo
+          - wget
+
+    - name: "Start nginx, MySQL"
+      service: "name={{ item }} state=started enabled=yes"
+      with_items:
+        - nginx
+        - mariadb
+
+    - name: Ensure mytrilog var www directory exists.
+      file:
+        path: "{{ app_path }}"
+        state: directory
+        owner: "{{app_user}}"
+        group: "{{app_user}}"
+        mode: 0755
+
+    - name: Git checkout knerr mytrilog
+      ansible.builtin.git:
+        repo: 'https://github.com/jeffknerr/mytrilog.git'
+        dest: /home/{{app_user}}/mytrilog
+    - name: rsync stuff over to var www
+      ansible.builtin.command:
+        cmd: /usr/bin/rsync -aq --delete --exclude-from ./{{domain}}/sync-exclude ./{{domain}} /var/www
+        chdir: /home/{{app_user}}
+
+    - name: Create a MySQL database for mytrilog.
+      mysql_db: "db={{ domain }} state=present login_unix_socket=/var/lib/mysql/mysql.sock"
+
+    - name: Create a MySQL user for mytrilog.
+      mysql_user:
+        name: "{{ app_user }}"
+        password: "{{dbpw}}"
+        priv: "{{ domain }}.*:ALL"
+        host: localhost
+        state: present
+        login_unix_socket: /var/lib/mysql/mysql.sock
+
+    - name: install virtual env
+      ansible.builtin.pip:
+        requirements: /var/www/{{domain}}/requirements.txt
+        virtualenv: /var/www/{{domain}}/venv
+        virtualenv_command: /usr/bin/python3 -m venv
+# add gunicorn
+    - name: add gunicorn to venv
+      ansible.builtin.pip:
+        name: gunicorn
+        virtualenv: /var/www/{{domain}}/venv
+# add .env file
+    - name: template env file
+      template:
+        src: envfile.j2
+        dest: /var/www/{{domain}}/.env
+        owner: root
+        group: root
+        mode: 0640
+# flask db upgrade in the venv
+    - name: cp upgrade shell script
+      copy:
+        src: dbupgrade.sh
+        dest: /home/{{app_user}}/dbupgrade.sh
+        owner: root
+        group: root
+        mode: 0755
+    - name: run flask db upgrade
+      ansible.builtin.command: 
+        cmd: /home/{{app_user}}/dbupgrade.sh
+    - name: chown everything to {{app_user}}
+      file:
+        path: /var/www/{{domain}}
+        owner: "{{app_user}}"
+        group: "{{app_user}}"
+        recurse: yes
+
+# create self-signed cert
+    - name: ensure ssl dir exists
+      file:
+        path: /etc/nginx/ssl
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+    - name: ssc generate SSL privkey
+      community.crypto.openssl_privatekey:
+        path: /etc/nginx/ssl/self-ssl.key
+    - name: create csr
+      ansible.builtin.command: 
+        cmd: openssl req -new -key /etc/nginx/ssl/self-ssl.key -out /etc/nginx/ssl/self-ssl.csr -subj "/C=US/ST=NY/L=NYC/O=MyTriLog/OU=IT Dept/CN=flask.test"
+        creates: /etc/nginx/ssl/self-ssl.csr
+    - name: create server cert
+      ansible.builtin.command: 
+        cmd: openssl x509 -req -days 365 -in /etc/nginx/ssl/self-ssl.csr -signkey /etc/nginx/ssl/self-ssl.key -out /etc/nginx/ssl/self-ssl.crt -subj "/C=US/ST=NY/L=NYC/O=MyTriLog/OU=IT Dept/CN=flask.test"
+        creates: /etc/nginx/ssl/self-ssl.crt
+    - name: change ssc key ownership group perms
+      ansible.builtin.file:
+        path: /etc/nginx/ssl/self-ssl.crt
+        owner: root
+        group: nginx
+        mode: '0640'
+# cp files
+    - name: ssc cp nginx dhparam file
+      copy:
+        src: dhparam.pem
+        dest: /etc/nginx/dhparam.pem
+        mode: 0644
+    - name: ssc cp ssl params file
+      copy:
+        src: ssl-params.conf
+        dest: /etc/nginx
+        mode: 0644
+      notify: 'restart nginx'
+    - name: ensure sites enabled dir exists
+      file:
+        path: /etc/nginx/sites-enabled
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+    - name: template cp flask.test nginx site file
+      template:
+        src: flask.test.j2
+        dest: /etc/nginx/sites-enabled/flask.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: 'restart nginx'
+    - name: cp new nginx file
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+        mode: 0644
+      notify: 'restart nginx'
+
+    - name: cp systemd file
+      copy:
+        src: mytrilog.service
+        dest: /etc/systemd/system/mytrilog.service
+        mode: 0644
+
+    - name: force systemd to reread configs
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+
+    - name: make sure mytrilog unit is running
+      ansible.builtin.systemd_service:
+        state: started
+        name: mytrilog
+        enabled: true
+...
