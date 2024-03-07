@@ -23,14 +23,15 @@
       ansible.builtin.command: 
         cmd: setenforce permissive
       notify: 'restart nginx'
+    - name: change timezone
+      ansible.builtin.command: 
+        cmd: timedatectl set-timezone US/Eastern
 
     # register system with redhat
     - name: register with redhat developer acct
       ansible.builtin.command: 
         cmd: subscription-manager register --username {{redhat_username}} --password {{redhat_password}}
 
-    # turn off firewall?? sshguard?? SELINUX?? fail2ban??
-    
     - name: Get software for yum repository management.
       yum:
         update_cache: true
